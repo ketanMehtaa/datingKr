@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  password       String
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime
+  gender         Gender
+  bio            String?
+  profilePicture String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  location         Location?
+  preferences      Preference?
+  interests        Interest[]
+  sentLikes        Like[]           @relation("SentLikes")
+  receivedLikes    Like[]           @relation("ReceivedLikes")
+  sentMessages     Message[]        @relation("SentMessages")
+  receivedMessages Message[]        @relation("ReceivedMessages")
+  matches          Match[]
+  blockedUsers     BlockedUser[]    @relation("UserWhoBlocked")
+  blockedByUsers   BlockedUser[]    @relation("BlockedUser")
+  reports          Report[]         @relation("ReportedBy")
+  reportedBy       Report[]         @relation("ReportedUser")
+  verification     UserVerification?
+  subscription     Subscription?
+  activities       UserActivity[]
+  organizedEvents  Event[]          @relation("Organizer")
+  attendedEvents   Event[]          @relation("Attendee")
+  photos           UserPhoto[]
+  notifications    Notification[]
+  preferencess      UserPreferences?
+  feedbacks        Feedback[]
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  latitude  Float
+  longitude Float
+  city      String
+  state     String?
+  country   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Preference {
+  id           String   @id @default(cuid())
+  minAge       Int
+  maxAge       Int
+  genderPref   Gender[]
+  maxDistance  Int
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Interest {
+  id        String   @id @default(cuid())
+  name      String
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id           String   @id @default(cuid())
+  sender       User     @relation("SentLikes", fields: [senderId], references: [id])
+  senderId     String
+  receiver     User     @relation("ReceivedLikes", fields: [receiverId], references: [id])
+  receiverId   String
+  isSuper      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@unique([senderId, receiverId])
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model BlockedUser {
+  id              String   @id @default(cuid())
+  blocker         User     @relation("UserWhoBlocked", fields: [blockerId], references: [id])
+  blockerId       String
+  blocked         User     @relation("BlockedUser", fields: [blockedId], references: [id])
+  blockedId       String
+  createdAt       DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  reporter    User         @relation("ReportedBy", fields: [reporterId], references: [id])
+  reporterId  String
+  reported    User         @relation("ReportedUser", fields: [reportedId], references: [id])
+  reportedId  String
+  reason      ReportReason
+  description String?
+  createdAt   DateTime     @default(now())
+}
+
+model UserVerification {
+  id           String             @id @default(cuid())
+  user         User               @relation(fields: [userId], references: [id])
+  userId       String             @unique
+  isVerified   Boolean            @default(false)
+  verifiedAt   DateTime?
+  method       VerificationMethod
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  plan      PlanType
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+}
+
+model UserActivity {
+  id        String       @id @default(cuid())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    String
+  action    ActivityType
+  createdAt DateTime     @default(now())
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  organizer   User     @relation("Organizer", fields: [organizerId], references: [id])
+  organizerId String
+  attendees   User[]   @relation("Attendee")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserPhoto {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  url       String
+  isPrivate Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  user      User             @relation(fields: [userId], references: [id])
+  userId    String
+  type      NotificationType
+  content   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}
+
+model UserPreferences {
+  id                  String  @id @default(cuid())
+  user                User    @relation(fields: [userId], references: [id])
+  userId              String  @unique
+  showOnlineStatus    Boolean @default(true)
+  emailNotifications  Boolean @default(true)
+  pushNotifications   Boolean @default(true)
+  hideLastSeen        Boolean @default(false)
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  content   String
+  rating    Int
+  createdAt DateTime @default(now())
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+  OTHER
+}
+
+enum ReportReason {
+  INAPPROPRIATE_CONTENT
+  HARASSMENT
+  SPAM
+  FAKE_PROFILE
+  OTHER
+}
+
+enum VerificationMethod {
+  EMAIL
+  PHONE
+  GOVERNMENT_ID
+  SOCIAL_MEDIA
+}
+
+enum PlanType {
+  FREE
+  BASIC
+  PREMIUM
+  VIP
+}
+
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  PROFILE_UPDATE
+  MATCH
+  MESSAGE_SENT
+}
+
+enum NotificationType {
+  NEW_MATCH
+  NEW_MESSAGE
+  LIKE_RECEIVED
+  EVENT_REMINDER
+  PROFILE_VIEW
+}
