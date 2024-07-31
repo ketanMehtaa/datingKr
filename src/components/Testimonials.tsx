@@ -2,14 +2,14 @@ import clsx from 'clsx';
 import Image from 'next/image';
 
 const featuredTestimonial = {
-  body: `Dr. Lalit Pokharia and the medical staff were exceptionally professional and attentive. They took the time to listen to my concerns, conducted a thorough examination, and explained the diagnosis and treatment options in a clear and understandable manner.`,
+  body: `Thanks to LoveConnect, I found my soulmate! The matching algorithm is spot-on, and the user experience is fantastic. Within weeks, I met someone special, and we've been happily together for over a year now.`,
   author: {
-    name: 'Rahul Singh Adhikari',
-    handle: 'RahulSingh',
-    imageUrl: 'https://lh3.googleusercontent.com/a-/ALV-UjWlNdlJhEgwVwrF9YTAPdasOYufrii1vrjWnfY1o6kzRQ5UI8l50A=w75-h75-p-rp-mo-ba2-br100',
-    logoUrl: '/images/logos/resend.svg',
+    name: 'Sarah Johnson',
+    handle: 'SarahJ',
+    imageUrl: '/images/testimonials/sarah.jpg',
   },
 };
+
 const testimonials: {
   body: string;
   author: {
@@ -21,39 +21,29 @@ const testimonials: {
   [
     [
       {
-        body: 'Excellent  treatment  in sharda ent hospital  advice people  to visited  hospitals  for any ent problem.',
+        body: 'I was skeptical about online dating, but LoveConnect changed my mind. The quality of matches was impressive!',
         author: {
-          name: 'anju bisht',
-          handle: 'anjubisht',
-          imageUrl: 'https://lh3.googleusercontent.com/a-/ALV-UjU_-loIMjk5Wkaqs913HB6kjU1mV-90KFnsNwRc0tQaaA3rZPo=w75-h75-p-rp-mo-br100',
+          name: 'Michael Chen',
+          handle: 'MikeC',
+          imageUrl: '',
         },
       },
       {
-        body: 'The care and attention I received were exceptional. My surgery was smooth, and the recovery was quick.',
+        body: 'The video chat feature made getting to know my matches so much easier and more comfortable.',
         author: {
-          name: 'Deepash Tiwari',
-          handle: 'DeepashTiwari',
-          imageUrl: '	https://lh3.googleusercontent.com/a-/ALV-UjXFv0az5rI5j_K5eoMtfKH87ibcve5RstX78T6PPyJ_EAgG5n8=w75-h75-p-rp-mo-br100',
-        },
-      },
-      {
-        body: 'I was nervous about my child’s tonsillectomy, but we were made to feel at ease. The procedure was a success, and my child is healthier than ever.',
-        author: {
-          name: 'Vinay Katiyar',
-          handle: 'ktyr',
-          imageUrl:
-            'https://ph-avatars.imgix.net/2743360/28744c72-2267-49ed-999d-5bdab677ec28?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+          name: 'Emily Rodriguez',
+          handle: 'EmilyR',
+          imageUrl: '',
         },
       },
     ],
     [
       {
-        body: `They diagnosed my ear problem quickly and provided effective treatment. The professionalism and compassion are unmatched. Thanks to their expertise, my sleep apnea is now manageable. The improvement in my quality of life is incredible.`,
+        body: `I appreciate the focus on safety and privacy. It made me feel secure while exploring connections. I've made great friends and even found a potential partner!`,
         author: {
-          name: 'kadir ansari',
-          handle: 'kadir',
-          imageUrl:
-            'https://lh3.googleusercontent.com/a-/ALV-UjXNYDLMrikxJAnYQ5Wz6ymDsXz-QLg2Nt6dW_qzMpSdPa8jU8hw_w=w45-h45-p-rp-mo-br100',
+          name: 'Alex Thompson',
+          handle: 'AlexT',
+          imageUrl: '',
         },
       },
     ],
@@ -61,39 +51,37 @@ const testimonials: {
   [
     [
       {
-        body: 'I highly recommend this clinic for anyone dealing with ENT issues.',
+        body: `The personality test really helped me find compatible matches. It's not just about looks here.`,
         author: {
-          name: 'vishal singh',
-          handle: 'vishalsingh',
-          imageUrl: 'https://pbs.twimg.com/profile_images/1558195781089120256/RWvUylSb_400x400.jpg',
+          name: 'Priya Patel',
+          handle: 'PriyaP',
+          imageUrl: '',
         },
       },
       {
-        body: 'The personalized care I received was outstanding. Everything was explained in detail, and all my questions were answered.',
+        body: `I love the dating tips and relationship advice section. It's helped me navigate the dating scene with confidence.`,
         author: {
-          name: 'Prem Saini',
-          handle: 'premsaini',
-          imageUrl:
-            'https://ph-avatars.imgix.net/4438396/079fabcb-7d01-42d9-a98f-2fc7befce04e?auto=compress&codec=mozjpeg&cs=strip&auto=format&w=120&h=120&fit=crop&dpr=2',
+          name: 'Chris Walker',
+          handle: 'ChrisW',
+          imageUrl: '',
         },
       },
     ],
     [
       {
-        body: `Sharda ENT Hospital is highly regarded for its expertise in ear, nose, and throat care. Patients often praise its skilled doctors, modern facilities, and personalized approach to treatment. Overall, it's considered a top choice for ENT care.'`,
+        body: `The events feature is amazing! I've attended several mixers and made genuine connections. It's a great way to meet people in a relaxed setting.`,
         author: {
-          name: 'Kaif mikrani',
-          handle: 'Kaifmikrani',
-          imageUrl: 'https://lh3.googleusercontent.com/a-/ALV-UjUxP5z0oEGp2cyWdmLvBT_2X4pozY6jQeVALmkdBJmxysPVNsoA=w75-h75-p-rp-mo-br100',
+          name: 'Olivia Lee',
+          handle: 'OliviaL',
+          imageUrl: '',
         },
       },
       {
-        body: `Their expertise in treating my allergies has been a game-changer. I no longer suffer from constant congestion and discomfort.`,
+        body: `As an LGBTQ+ individual, I felt truly welcome on this platform. The inclusive environment made all the difference in my dating journey.`,
         author: {
-          name: 'Rahul Kumar',
-          handle: 'RahulKumar',
-          imageUrl:
-            'https://lh3.googleusercontent.com/a-/ALV-UjXmVtA9PeDDETyOqHhKfdFW5hBzQqmPSKwjYWoFAdMkVk4kLe_d=w75-h75-p-rp-mo-br100',
+          name: 'Jamie Rivera',
+          handle: 'JamieR',
+          imageUrl: '',
         },
       },
     ],
@@ -105,9 +93,9 @@ export function Testimonials() {
     <div className="relative isolate bg-white pb-20 pt-12 sm:pt-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-xl text-center">
-          <h2 className="text-lg font-semibold leading-8 tracking-tight text-blue-600">Sharda Ent Hospital</h2>
+          <h2 className="text-lg font-semibold leading-8 tracking-tight text-blue-600">Hamy</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Hear From Our Satisfied Patients
+            Hear From Our Partners
           </p>
         </div>
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-4">

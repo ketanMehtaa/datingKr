@@ -1,67 +1,53 @@
 const faqs = [
   {
-    question: "Do you store my personal information?",
+    question: 'How do you protect my privacy?',
     answer:
-      "We store your personal information securely to facilitate your appointments and provide better service. Your privacy is our priority, and we adhere to strict data protection protocols.",
+      'We take your privacy seriously. Your personal information is securely stored and never shared without your consent. We use encryption and follow strict data protection protocols to ensure your dating experience remains confidential.',
   },
   {
-    question: "How can I book an appointment?",
+    question: 'How do I create a profile?',
     answer: (
       <>
-        You can book an appointment online through our{" "}
-        <a
-          href="/"
-          target="_blank"
-          className="font-semibold hover:underline"
-        >
-          booking page
+        Creating a profile is easy! Just visit our{' '}
+        <a href="/signup" target="_blank" className="font-semibold hover:underline">
+          sign-up page
         </a>
-        . We offer both online and offline consultation options.
+        . You ll be guided through steps to set up your profile, including uploading photos and describing your
+        interests.
       </>
     ),
   },
   {
-    question: "What services do you offer?",
+    question: 'What features does your dating site offer?',
     answer:
-      "We provide specialized ENT services along with general OPD consultations. Our services include treatment for ear, nose, and throat conditions, and general healthcare.",
+      'We offer a range of features to enhance your dating experience, including advanced matching algorithms, instant messaging, video chat, virtual date ideas, and personality compatibility tests.',
   },
   {
-    question: "Do you accept walk-in patients?",
+    question: 'Is your dating site free to use?',
     answer:
-      "Yes, we accept walk-in patients for OPD. However, we recommend booking an appointment online to avoid waiting times.",
+      'We offer both free and premium memberships. Free members can create profiles, browse, and send limited messages. Premium members enjoy additional features like unlimited messaging, seeing who liked your profile, and advanced search filters.',
   },
   {
-    question: "What are your hospital timings?",
+    question: 'How does your matching system work?',
     answer:
-      "Our hospital is open from 9:00 AM to 8:00 PM, all days. For emergency cases, we are available 24/7 in Haldwani.",
+      'Our sophisticated algorithm considers factors like your preferences, interests, location, and behavior on the site to suggest compatible matches. We continuously refine our system to improve match quality.',
   },
   {
-    question: "How can I contact the hospital?",
+    question: 'How can I contact customer support?',
     answer: (
       <>
-        You can contact us via phone at{" "}
-        <a
-          href="tel:+919548040347"
-          className="font-semibold underline"
-        >
-          +919548040347
-        </a>{" "}
-        or email us at{" "}
-        <a
-          href="mailto:shardaEntHospital@gmail.com"
-          target="_blank"
-          className="font-semibold underline"
-        >
-          shardaEntHospital@gmail.com
+        Our support team is available 24/7. You can reach us via email at{' '}
+        <a href="mailto:support@datingsite.com" target="_blank" className="font-semibold underline">
+          support@datingsite.com
         </a>
-        . We are here to assist you with any queries or concerns.
+        , or through the Help section in your account dashboard.
       </>
     ),
   },
   {
-    question: "Do you offer online consultations?",
+    question: 'How can I stay safe while online dating?',
     answer:
-      "Yes, we offer online consultations through our booking system. You can choose a time slot that suits you and have a consultation from the comfort of your home.",
+      'We prioritize your safety. Always meet in public places for first dates, tell a friend about your plans, and use our in-app video chat feature to get to know someone before meeting in person. Report any suspicious behavior to our moderation team immediately.',
   },
 ];
 
@@ -71,18 +57,11 @@ export function FAQs() {
       className="mx-auto max-w-2xl divide-y divide-gray-900/10 px-6 pb-8 sm:pb-24 sm:pt-12 lg:max-w-7xl lg:px-8 lg:pb-32"
       id="faq"
     >
-      <h2 className="font-cal text-2xl leading-10 text-gray-900">
-        Frequently asked questions
-      </h2>
+      <h2 className="font-cal text-2xl leading-10 text-gray-900">Frequently asked questions</h2>
       <dl className="mt-10 space-y-8 divide-y divide-gray-900/10">
         {faqs.map((faq) => (
-          <div
-            key={faq.question}
-            className="pt-8 lg:grid lg:grid-cols-12 lg:gap-8"
-          >
-            <dt className="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">
-              {faq.question}
-            </dt>
+          <div key={faq.question} className="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
+            <dt className="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">{faq.question}</dt>
             <dd className="mt-4 lg:col-span-7 lg:mt-0">
               <p className="text-base leading-7 text-gray-600">{faq.answer}</p>
             </dd>

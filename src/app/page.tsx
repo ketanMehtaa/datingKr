@@ -1,29 +1,19 @@
-import Image from 'next/image';
 import Header from '../components/Header';
-import Startcarousel from '@/components/Startcarousel';
-import CalEnt from '../components/CalEnt.js';
-import CalOpd from '../components/CalOpd.js';
-
 import { Testimonials } from '@/components/Testimonials';
 import { FAQs } from '@/components/FAQs';
 import { Footer } from '@/components/Footer';
-
+import Background from './Background';
 export default function Home() {
   return (
     <>
+
       <main>
         <Header />
-        <Startcarousel />
-        <div >
-          <h2 className=" text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mt-[60px] mb-[40px] ml-2 mr-2">
-            Book Your Appointment.
-          </h2>
-          <CalEnt />
-          <CalOpd />
-        </div>
-        <div className="lg:px-8">
+        <Background />
+
+        {/* <div className="lg:px-8">
           <Testimonials />
-        </div>
+        </div> */}
         <FAQs />
         {/* <div className="flex justify-center flex-col p-5">
           <h2 className=" text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center m-4">Locate Us.</h2>
@@ -38,7 +28,7 @@ export default function Home() {
             ></iframe>
           </div>
         </div> */}
-        <Footer/>
+        <Footer />
       </main>
     </>
   );

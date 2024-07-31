@@ -6,18 +6,33 @@ import { Menu } from 'lucide-react';
 
 const routes = [
   {
-    href: '/',
+    href: '',
     label: 'Home',
   },
-
-  { href: '/', label: 'Book Appointment' },
-  { href: '/', label: 'About us' },
-  { href: '/', label: 'Locate us' },
-  { href: '/', label: 'Pricing' },
+  {
+    href: '',
+    label: 'Matches',
+  },
+  {
+    href: '',
+    label: 'Browse',
+  },
+  {
+    href: '',
+    label: 'Messages',
+  },
+  {
+    href: '',
+    label: 'My Profile',
+  },
+  // {
+  //   href: '',
+  //   label: 'Upgrade',
+  // },
 ];
 const Header = () => {
   return (
-    <header className="fixed top-0 left-0 w-full bg-white shadow-md z-50 rounded-xl			">
+    <header className="fixed top-2 left-0 right-0 w-11/12 bg-pink-700 shadow-md z-50 rounded-xl mx-auto">
       <Container>
         <div className="relative px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between w-full">
           <div className="flex items-center">
@@ -28,7 +43,7 @@ const Header = () => {
               <SheetContent side="left" className="w-[300px] sm:w-[400px]">
                 <nav className="flex flex-col gap-4">
                   {routes.map((route, i) => (
-                    <Link key={i} href={route.href} className="block px-2 py-1 text-lg">
+                    <Link key={i} href={route.href} className="block px-2 py-1 text-lg ">
                       {route.label}
                     </Link>
                   ))}
@@ -36,13 +51,13 @@ const Header = () => {
               </SheetContent>
             </Sheet>
             <Link href="/" className="ml-4 lg:ml-0">
-              <h1 className=" tracking-tight text-gray-900 text-xl font-bold"> Sharda Ent Hospital</h1>
+              <h1 className=" tracking-tight  text-xl font-bold text-white"> Hamy</h1>
             </Link>
           </div>
           <nav className="mx-6 flex items-center space-x-4 lg:space-x-6  lg:block hidden">
             {routes.map((route, i) => (
               <Button asChild variant="ghost" key={i}>
-                <Link href={route.href} className="text-sm font-medium transition-colors">
+                <Link href={route.href} className="text-sm font-medium text-white transition-colors">
                   {route.label}
                 </Link>
               </Button>
