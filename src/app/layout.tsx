@@ -3,6 +3,7 @@ import './globals.css';
 import { CSPostHogProvider } from './providers';
 import { cn } from '@/lib/utils';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { NextAuthProvider } from '@/providers/next-auth';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -83,11 +84,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="no-scrollbar">
-      <CSPostHogProvider>
-        <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
-          {children}
-        </body>
-      </CSPostHogProvider>
+      <NextAuthProvider>
+        <CSPostHogProvider>
+          <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>{children}</body>
+        </CSPostHogProvider>
+      </NextAuthProvider>
     </html>
   );
 }
