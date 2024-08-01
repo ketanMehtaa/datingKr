@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axios from 'axios';
+// import useDebounce from '../../components/useDebounce'
 
 interface FormData {
   firstName: string;
@@ -12,13 +13,13 @@ interface FormData {
   dateOfBirth: string;
   gender: string;
   bio: string;
-  profilePicture: string;
-  localAdress: string;
+  localAddress: string;
   city: string;
   state: string;
   country: string;
-  latitude: string;
-  longitude: string;
+  latitude: number ;
+  longitude: number ;
+
 }
 
 function toNumberString(num: number) {
@@ -52,16 +53,16 @@ export default function CompleteProfileForm() {
     dateOfBirth: '',
     gender: '',
     bio: '',
-    profilePicture: '',
-    localAdress: '',
+    localAddress: '',
     city: '',
     state: '',
     country: '',
-    latitude: '',
-    longitude: '',
+    latitude: 0,
+    longitude: 0,
   });
   const [loading, setLoading] = useState(false);
   const [locationError, setLocationError] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
     requestLocationPermission();
@@ -85,7 +86,7 @@ export default function CompleteProfileForm() {
             //   ...prevState,
             //   latitude,
             //   longitude,
-            //   localAdress: locationData.formatted_address || '',
+            //   localAddress: locationData.formatted_address || '',
             //   city: locationData.address_components.find((comp) => comp.types.includes('locality'))?.long_name || '',
             //   state:
             //     locationData.address_components.find((comp) => comp.types.includes('administrative_area_level_1'))
@@ -95,8 +96,8 @@ export default function CompleteProfileForm() {
             setFormData((prevState: FormData) => ({
               ...prevState,
               // todo uncommment latitude and longitude
-              // latitude,
-              // longitude,
+              latitude,
+              longitude,
               localAddress: locationData.formatted_address || '',
               city:
                 locationData.address_components.find((comp: any) => comp.types.includes('locality'))?.long_name || '',
@@ -122,6 +123,13 @@ export default function CompleteProfileForm() {
     }
   }, []);
 
+  // useEffect(() => {
+  //   if (debouncedSearch) {
+  //     fetch(`/api/search?q=${debouncedSearch}`)
+  //   }
+  // }, [debouncedSearch])
+  // return <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
+
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -130,22 +138,56 @@ export default function CompleteProfileForm() {
     }));
   };
 
+  // const fetchSuggestions = useCallback(
+  //   debounce(async (input) => {
+  //     if (input.length < 3) return;
+  //     try {
+  //       const response = await axios.get(`https://api.olamaps.io/places/v1/autocomplete`, {
+  //         params: {
+  //           input,
+  //           api_key: 'YOUR_API_KEY_HERE', // Replace with your actual API key
+  //         },
+  //         headers: {
+  //           'X-Request-Id': 'unique-request-id', // Generate a unique ID for each request
+  //         },
+  //       });
+  //       setSuggestions(response.data.results || []);
+  //     } catch (error) {
+  //       console.error('Error fetching suggestions:', error);
+  //     }
+  //   }, 300),
+  //   []
+  // );
+
+  // const handleSuggestionSelect = (suggestion: any) => {
+  //   setFormData((prevState) => ({
+  //     ...prevState,
+  //     localAddress: suggestion.formatted_address,
+  //     city: suggestion.address_components.find((comp: any) => comp.types.includes('locality'))?.long_name || '',
+  //     state:
+  //       suggestion.address_components.find((comp: any) => comp.types.includes('administrative_area_level_1'))
+  //         ?.long_name || '',
+  //     country: suggestion.address_components.find((comp: any) => comp.types.includes('country'))?.long_name || '',
+  //     latitude: suggestion.geometry.location.lat,
+  //     longitude: suggestion.geometry.location.lng,
+  //   }));
+  //   setSuggestions([]);
+  // };
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      const resProfile = await fetch('/api/complete-profile', {
-        method: 'POST',
+      const resProfile = await axios.post('/api/profileCompletion', formData, {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
       });
 
-      if (resProfile.ok) {
+      if (resProfile.status === 200) {
         // Handle success
         console.log('Profile updated successfully');
       } else {
-        // Handle error
+        // This part is optional as any status other than 200 will throw an error caught in catch block
         console.error('Failed to update profile');
       }
     } catch (error) {
@@ -156,7 +198,7 @@ export default function CompleteProfileForm() {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md">
+    <div className="mt-3 p-6 max-w-md mx-auto bg-white rounded-lg shadow-xl">
       <h1 className="text-2xl font-semibold mb-4">Complete Your Profile</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
@@ -188,6 +230,7 @@ export default function CompleteProfileForm() {
           required
           className="w-full"
         />
+        {/* todo required not working in gender */}
         <Select
           name="gender"
           value={formData.gender}
@@ -200,7 +243,10 @@ export default function CompleteProfileForm() {
           <SelectContent>
             <SelectItem value="MALE">Male</SelectItem>
             <SelectItem value="FEMALE">Female</SelectItem>
-            {/* Add more options if needed */}
+            <SelectItem value="NON_BINARY">Non Binary</SelectItem>
+            <SelectItem value="TRANSGENDER_MALE">Transgender Male</SelectItem>
+            <SelectItem value="TRANSGENDER_FEMALE">Transgender Female</SelectItem>
+            <SelectItem value="PREFER_NOT_TO_SAY">Prefer Not To Say</SelectItem>
           </SelectContent>
         </Select>
         <Textarea
@@ -210,22 +256,47 @@ export default function CompleteProfileForm() {
           onChange={handleChange}
           className="w-full"
         />
-        <Input
+        {/* <Input
           name="profilePicture"
           type="url"
           placeholder="Enter profile picture URL"
           value={formData.profilePicture}
           onChange={handleChange}
           className="w-full"
-        />
+        /> */}
         <Input
-          name="localAdress"
+          name="localAddress"
           type="text"
           placeholder="Local Address"
-          value={formData.localAdress}
+          value={formData.localAddress}
           onChange={handleChange}
           className="w-full"
+          required
         />
+        {/* <div className="relative">
+          <Input
+            name="localAddress"
+            type="text"
+            placeholder="Local Address"
+            value={formData.localAddress}
+            onChange={handleChange}
+            className="w-full"
+          />
+          {suggestions.length > 0 && (
+            <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded-md shadow-lg">
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleSuggestionSelect(suggestion)}
+                >
+                  {suggestion?.formatted_address}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div> */}
+
         <Input
           name="city"
           type="text"
@@ -233,6 +304,7 @@ export default function CompleteProfileForm() {
           value={formData.city}
           onChange={handleChange}
           className="w-full"
+          required
         />
         <Input
           name="state"
@@ -241,6 +313,7 @@ export default function CompleteProfileForm() {
           value={formData.state}
           onChange={handleChange}
           className="w-full"
+          required
         />
         <Input
           name="country"
@@ -249,9 +322,10 @@ export default function CompleteProfileForm() {
           value={formData.country}
           onChange={handleChange}
           className="w-full"
+          required
         />
         {locationError && <p className="text-red-500">{locationError}</p>}
-        <Button type="submit" className="w-full bg-blue-500 text-white hover:bg-blue-600">
+        <Button type="submit" className="w-full bg-pink-700 text-white hover:bg-pink-700">
           {loading ? 'Saving...' : 'Save'}
         </Button>
       </form>
