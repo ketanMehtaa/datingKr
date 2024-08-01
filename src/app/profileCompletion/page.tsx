@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axios from 'axios';
 // import useDebounce from '../../components/useDebounce'
+import { useRouter } from 'next/navigation'
 
 interface FormData {
   firstName: string;
@@ -47,6 +48,7 @@ function requestLocationPermission() {
 }
 
 export default function CompleteProfileForm() {
+
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -63,6 +65,8 @@ export default function CompleteProfileForm() {
   const [loading, setLoading] = useState(false);
   const [locationError, setLocationError] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const router = useRouter()
+
 
   useEffect(() => {
     requestLocationPermission();
@@ -185,7 +189,9 @@ export default function CompleteProfileForm() {
 
       if (resProfile.status === 200) {
         // Handle success
-        console.log('Profile updated successfully');
+        
+        console.log('Profile updated successfully , redirecting to dashboard');
+        router.push('/dashboard')
       } else {
         // This part is optional as any status other than 200 will throw an error caught in catch block
         console.error('Failed to update profile');
