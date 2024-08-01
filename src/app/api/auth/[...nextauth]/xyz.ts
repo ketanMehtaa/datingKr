@@ -1,9 +1,10 @@
-import { NextAuthOptions } from 'next-auth';
+// import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { prisma } from '../../../../../prisma/index';
 
-import { type DefaultSession, Account } from 'next-auth';
+// import { type DefaultSession, Account } from 'next-auth';
+import { type NextAuthConfig, type DefaultSession, Account } from "next-auth";
 
 interface Session {
   user: {} & DefaultSession['user'] & { id: string };
@@ -11,7 +12,9 @@ interface Session {
   error?: string | 'RefreshAccessTokenError';
 }
 
-export const authOptions: NextAuthOptions = {
+export const getAuthOptions: (options?: {
+  consent: boolean;
+}) => NextAuthConfig = (options) => ({
   providers: [
     GoogleProvider({
       clientId: process.env.NEXT_GOOGLE_CLIENT_ID || '',
@@ -163,4 +166,5 @@ export const authOptions: NextAuthOptions = {
       },
     },
   },
-};
+});
+export const authOptions = getAuthOptions();

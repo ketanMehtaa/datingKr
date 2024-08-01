@@ -3,4 +3,20 @@ services:
   nextjs:
     build: .
     ports:
-      - "3000:3000"
+      - "3250:3000"
+
+#       version: '3'
+# services:
+#   nextjs:
+#     build: .
+#     ports:
+#       - "3250:3000"
+#     environment:
+#       # - DATABASE_URL=postgresql://user:password@host.docker.internal:5432/mydb
+#       - DATABASE_URL=postgresql://postgres:ketan@host.docker.internal:5432/postgres
+#     networks:
+#       - host
+
+# networks:
+#   host:
+#     external: true
