@@ -9,61 +9,61 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.NEXT_GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.NEXT_GOOGLE_CLIENT_SECRET || '',
     }),
-    CredentialsProvider({
-      id: 'credentials',
-      name: 'Credentials',
-      type: 'credentials',
-      credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        if (!credentials || !credentials.email || !credentials.password) {
-          throw new Error('Invalid credentials');
-        }
+    // CredentialsProvider({
+    //   id: 'credentials',
+    //   name: 'Credentials',
+    //   type: 'credentials',
+    //   credentials: {
+    //     email: { label: 'Email', type: 'text' },
+    //     password: { label: 'Password', type: 'password' },
+    //   },
+    //   async authorize(credentials) {
+    //     if (!credentials || !credentials.email || !credentials.password) {
+    //       throw new Error('Invalid credentials');
+    //     }
 
-        try {
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email,
-            },
-          });
+    //     try {
+    //       const user = await prisma.user.findUnique({
+    //         where: {
+    //           email: credentials.email,
+    //         },
+    //       });
 
-          if (!user) {
-            // Create new user if not found
-            const newUser = await prisma.user.create({
-              data: {
-                email: credentials.email,
-                password: credentials.password,
-                // Include default values for other required fields
-              },
-            });
+    //       if (!user) {
+    //         // Create new user if not found
+    //         const newUser = await prisma.user.create({
+    //           data: {
+    //             email: credentials.email,
+    //             password: credentials.password,
+    //             // Include default values for other required fields
+    //           },
+    //         });
 
-            return {
-              id: newUser.id,
-              email: newUser.email,
-              name: newUser.firstName || 'User',
-              // image: newUser.profilePicture || '',
-            };
-          } else {
-            // Check password (consider using a hashing method for production)
-            if (user.password !== credentials.password) {
-              throw new Error('Incorrect password');
-            }
+    //         return {
+    //           id: newUser.id,
+    //           email: newUser.email,
+    //           name: newUser.firstName || 'User',
+    //           // image: newUser.profilePicture || '',
+    //         };
+    //       } else {
+    //         // Check password (consider using a hashing method for production)
+    //         if (user.password !== credentials.password) {
+    //           throw new Error('Incorrect password');
+    //         }
 
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.firstName || 'User',
-              // image: user.profilePicture || '',
-            };
-          }
-        } catch (error) {
-          console.error('Authorization error:', error);
-          throw new Error('Authentication error');
-        }
-      },
-    }),
+    //         return {
+    //           id: user.id,
+    //           email: user.email,
+    //           name: user.firstName || 'User',
+    //           // image: user.profilePicture || '',
+    //         };
+    //       }
+    //     } catch (error) {
+    //       console.error('Authorization error:', error);
+    //       throw new Error('Authentication error');
+    //     }
+    //   },
+    // }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -103,11 +103,12 @@ export const authOptions: NextAuthOptions = {
           }
 
           return true;
-        } else if (account?.provider === 'credentials') {
-          return true;
-        } else {
-          return false;
-        }
+        } 
+        // else if (account?.provider === 'credentials') {
+        //   return true;
+        // } else {
+        //   return false;
+        // }
       } catch (error) {
         console.error('Sign-in callback error:', error);
         return false;

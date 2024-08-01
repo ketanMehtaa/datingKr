@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--inspect' next dev --port 3001",
+    "dev": "NODE_OPTIONS='--inspect' next dev --port 3001p",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -15,7 +15,9 @@
     "@prisma/client": "^5.17.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
+    "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-autoplay": "^8.1.6",

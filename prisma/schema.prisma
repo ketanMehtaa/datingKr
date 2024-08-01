@@ -8,64 +8,66 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  password       String?
-  firstName      String
-  lastName       String?
-  dateOfBirth    DateTime?
-  gender         Gender?
-  bio            String?
-  profilePicture String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  email            String    @unique
+  password         String?
+  firstName        String
+  lastName         String?
+  dateOfBirth      DateTime?
+  gender           Gender?
+  bio              String?
+  profilePicture   String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  profileCompleted Boolean   @default(false)
 
   location         Location?
   preferences      Preference?
   interests        Interest[]
-  sentLikes        Like[]           @relation("SentLikes")
-  receivedLikes    Like[]           @relation("ReceivedLikes")
-  sentMessages     Message[]        @relation("SentMessages")
-  receivedMessages Message[]        @relation("ReceivedMessages")
+  sentLikes        Like[]            @relation("SentLikes")
+  receivedLikes    Like[]            @relation("ReceivedLikes")
+  sentMessages     Message[]         @relation("SentMessages")
+  receivedMessages Message[]         @relation("ReceivedMessages")
   matches          Match[]
-  blockedUsers     BlockedUser[]    @relation("UserWhoBlocked")
-  blockedByUsers   BlockedUser[]    @relation("BlockedUser")
-  reports          Report[]         @relation("ReportedBy")
-  reportedBy       Report[]         @relation("ReportedUser")
+  blockedUsers     BlockedUser[]     @relation("UserWhoBlocked")
+  blockedByUsers   BlockedUser[]     @relation("BlockedUser")
+  reports          Report[]          @relation("ReportedBy")
+  reportedBy       Report[]          @relation("ReportedUser")
   verification     UserVerification?
   subscription     Subscription?
   activities       UserActivity[]
-  organizedEvents  Event[]          @relation("Organizer")
-  attendedEvents   Event[]          @relation("Attendee")
+  organizedEvents  Event[]           @relation("Organizer")
+  attendedEvents   Event[]           @relation("Attendee")
   photos           UserPhoto[]
   notifications    Notification[]
-  preferencess      UserPreferences?
+  preferencess     UserPreferences?
   feedbacks        Feedback[]
 }
 
 model Location {
-  id        String   @id @default(cuid())
-  latitude  Float
-  longitude Float
-  city      String
-  state     String?
-  country   String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  latitude    Float
+  longitude   Float
+  localAdress String
+  city        String
+  state       String?
+  country     String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Preference {
-  id           String   @id @default(cuid())
-  minAge       Int
-  maxAge       Int
-  genderPref   Gender[]
-  maxDistance  Int
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  minAge      Int
+  maxAge      Int
+  genderPref  Gender[]
+  maxDistance Int
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Interest {
@@ -77,13 +79,13 @@ model Interest {
 }
 
 model Like {
-  id           String   @id @default(cuid())
-  sender       User     @relation("SentLikes", fields: [senderId], references: [id])
-  senderId     String
-  receiver     User     @relation("ReceivedLikes", fields: [receiverId], references: [id])
-  receiverId   String
-  isSuper      Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  id         String   @id @default(cuid())
+  sender     User     @relation("SentLikes", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User     @relation("ReceivedLikes", fields: [receiverId], references: [id])
+  receiverId String
+  isSuper    Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
   @@unique([senderId, receiverId])
 }
@@ -108,12 +110,12 @@ model Message {
 }
 
 model BlockedUser {
-  id              String   @id @default(cuid())
-  blocker         User     @relation("UserWhoBlocked", fields: [blockerId], references: [id])
-  blockerId       String
-  blocked         User     @relation("BlockedUser", fields: [blockedId], references: [id])
-  blockedId       String
-  createdAt       DateTime @default(now())
+  id        String   @id @default(cuid())
+  blocker   User     @relation("UserWhoBlocked", fields: [blockerId], references: [id])
+  blockerId String
+  blocked   User     @relation("BlockedUser", fields: [blockedId], references: [id])
+  blockedId String
+  createdAt DateTime @default(now())
 
   @@unique([blockerId, blockedId])
 }
@@ -130,12 +132,12 @@ model Report {
 }
 
 model UserVerification {
-  id           String             @id @default(cuid())
-  user         User               @relation(fields: [userId], references: [id])
-  userId       String             @unique
-  isVerified   Boolean            @default(false)
-  verifiedAt   DateTime?
-  method       VerificationMethod
+  id         String             @id @default(cuid())
+  user       User               @relation(fields: [userId], references: [id])
+  userId     String             @unique
+  isVerified Boolean            @default(false)
+  verifiedAt DateTime?
+  method     VerificationMethod
 }
 
 model Subscription {
@@ -189,13 +191,13 @@ model Notification {
 }
 
 model UserPreferences {
-  id                  String  @id @default(cuid())
-  user                User    @relation(fields: [userId], references: [id])
-  userId              String  @unique
-  showOnlineStatus    Boolean @default(true)
-  emailNotifications  Boolean @default(true)
-  pushNotifications   Boolean @default(true)
-  hideLastSeen        Boolean @default(false)
+  id                 String  @id @default(cuid())
+  user               User    @relation(fields: [userId], references: [id])
+  userId             String  @unique
+  showOnlineStatus   Boolean @default(true)
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  hideLastSeen       Boolean @default(false)
 }
 
 model Feedback {

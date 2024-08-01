@@ -24,7 +24,7 @@ export default function background() {
         <div className="absolute sm:bottom-1/4 sm:right-12 bottom-6 flex flex-col gap-2 items-center sm:w-auto w-full">
           <Button
             className=" bg-pink-700 font-bold tracking-tight text-center rounded-full w-64 hover:bg-pink-700"
-            onClick={() => signIn('', { callbackUrl: '/' })}
+            onClick={() => signIn('', { callbackUrl: '/profileCompletion' })}
           >
             Create Account
           </Button>
