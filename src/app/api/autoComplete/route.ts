@@ -44,7 +44,7 @@ export async function PUT(req: Request) {
     // const data = await response.json();
     return new NextResponse(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json' } });
     
-  } catch (error) {
+  } catch (error:any) {
     console.error('Error:', error);
     return new NextResponse(`Error: ${error.message}`, { status: 500 });
   }

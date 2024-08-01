@@ -6,6 +6,29 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axios from 'axios';
 
+interface FormData {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
+  bio: string;
+  profilePicture: string;
+  localAdress: string;
+  city: string;
+  state: string;
+  country: string;
+  latitude: string;
+  longitude: string;
+}
+
+function toNumberString(num: number) {
+  if (Number.isInteger(num)) {
+    return num + '.0';
+  } else {
+    return num.toString();
+  }
+}
+
 function requestLocationPermission() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
@@ -23,7 +46,7 @@ function requestLocationPermission() {
 }
 
 export default function CompleteProfileForm() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
     dateOfBirth: '',
@@ -58,14 +81,30 @@ export default function CompleteProfileForm() {
             const data = res.data;
             const locationData = data.results[0] || {};
 
-            setFormData((prevState) => ({
+            // setFormData((prevState) => ({
+            //   ...prevState,
+            //   latitude,
+            //   longitude,
+            //   localAdress: locationData.formatted_address || '',
+            //   city: locationData.address_components.find((comp) => comp.types.includes('locality'))?.long_name || '',
+            //   state:
+            //     locationData.address_components.find((comp) => comp.types.includes('administrative_area_level_1'))
+            //       ?.long_name || '',
+            //   country: locationData.address_components.find((comp) => comp.types.includes('country'))?.long_name || '',
+            // }));
+            setFormData((prevState: FormData) => ({
               ...prevState,
-              latitude,
-              longitude,
-              localAdress: locationData.formatted_address || '',
-              city: locationData.address_components.find(comp => comp.types.includes('locality'))?.long_name || '',
-              state: locationData.address_components.find(comp => comp.types.includes('administrative_area_level_1'))?.long_name || '',
-              country: locationData.address_components.find(comp => comp.types.includes('country'))?.long_name || '',
+              // todo uncommment latitude and longitude
+              // latitude,
+              // longitude,
+              localAddress: locationData.formatted_address || '',
+              city:
+                locationData.address_components.find((comp: any) => comp.types.includes('locality'))?.long_name || '',
+              state:
+                locationData.address_components.find((comp: any) => comp.types.includes('administrative_area_level_1'))
+                  ?.long_name || '',
+              country:
+                locationData.address_components.find((comp: any) => comp.types.includes('country'))?.long_name || '',
             }));
           } catch (error) {
             console.error('Error fetching reverse geocode data:', error);
@@ -73,7 +112,9 @@ export default function CompleteProfileForm() {
           }
         },
         (error) => {
-          setLocationError('Unable to retrieve location. Please make sure location services are enabled and try again.');
+          setLocationError(
+            'Unable to retrieve location. Please make sure location services are enabled and try again.'
+          );
         }
       );
     } else {
@@ -81,7 +122,7 @@ export default function CompleteProfileForm() {
     }
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -89,7 +130,7 @@ export default function CompleteProfileForm() {
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     setLoading(true);
 
@@ -120,7 +161,7 @@ export default function CompleteProfileForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           name="firstName"
-          label="First Name"
+          // label="First Name"
           type="text"
           placeholder="Enter your first name"
           value={formData.firstName}
@@ -130,7 +171,7 @@ export default function CompleteProfileForm() {
         />
         <Input
           name="lastName"
-          label="Last Name"
+          // label="Last Name"
           type="text"
           placeholder="Enter your last name"
           value={formData.lastName}
@@ -140,7 +181,7 @@ export default function CompleteProfileForm() {
         />
         <Input
           name="dateOfBirth"
-          label="Date of Birth"
+          // label="Date of Birth"
           type="date"
           value={formData.dateOfBirth}
           onChange={handleChange}
@@ -152,7 +193,6 @@ export default function CompleteProfileForm() {
           value={formData.gender}
           onValueChange={(value) => setFormData({ ...formData, gender: value })}
           required
-          className="w-full"
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select Gender" />
@@ -165,7 +205,6 @@ export default function CompleteProfileForm() {
         </Select>
         <Textarea
           name="bio"
-          label="Bio"
           placeholder="Write something about yourself"
           value={formData.bio}
           onChange={handleChange}
@@ -173,7 +212,6 @@ export default function CompleteProfileForm() {
         />
         <Input
           name="profilePicture"
-          label="Profile Picture URL"
           type="url"
           placeholder="Enter profile picture URL"
           value={formData.profilePicture}
@@ -182,7 +220,6 @@ export default function CompleteProfileForm() {
         />
         <Input
           name="localAdress"
-          label="Local Address"
           type="text"
           placeholder="Local Address"
           value={formData.localAdress}
@@ -191,7 +228,6 @@ export default function CompleteProfileForm() {
         />
         <Input
           name="city"
-          label="City"
           type="text"
           placeholder="City"
           value={formData.city}
@@ -200,7 +236,6 @@ export default function CompleteProfileForm() {
         />
         <Input
           name="state"
-          label="State"
           type="text"
           placeholder="State"
           value={formData.state}
@@ -209,7 +244,6 @@ export default function CompleteProfileForm() {
         />
         <Input
           name="country"
-          label="Country"
           type="text"
           placeholder="Country"
           value={formData.country}
