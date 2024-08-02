@@ -4,6 +4,9 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useState } from 'react';
 import { motion, useAnimation } from 'framer-motion';
+import axios from 'axios';
+import { useEffect, useCallback } from 'react';
+
 
 interface Profile {
   id: number;
@@ -78,6 +81,27 @@ export default function Home() {
       image: 'https://photosnow.org/wp-content/uploads/2024/04/indian-girl-photo_15.jpg',
     },
   ]);
+  
+  useEffect(() => {
+    // Define the async function
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/recommendation', {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        console.log('Response data:', response.data);
+        // setData(response.data); // Set the response data to state
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        // setError(err.message); // Set error message to state
+      } finally {
+        // setLoading(false); // Set loading to false once data is fetched or an error occurs
+      }
+    };
+
+    // Call the async function
+    fetchData();
+  }, []); // Empty dependency array means this effect runs once after initial render
 
   const controls = useAnimation();
 
@@ -173,3 +197,5 @@ export default function Home() {
     </>
   );
 }
+
+

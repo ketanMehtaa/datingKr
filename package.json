@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@hookform/resolvers": "^3.6.0",
     "@next/third-parties": "^14.2.3",
     "@prisma/client": "^5.17.0",
@@ -35,6 +37,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
