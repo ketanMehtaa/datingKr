@@ -45,19 +45,42 @@ var Gender;
     Gender["MALE"] = "MALE";
     Gender["FEMALE"] = "FEMALE";
 })(Gender || (Gender = {}));
+function getRandomCoordinates(centerLat, centerLng, radiusKm) {
+    // Radius of the Earth in kilometers
+    var R = 6371;
+    // Random distance and angle
+    // const d = radiusKm * Math.random();
+    var d = 25;
+    var theta = Math.random() * 2 * Math.PI;
+    // Latitude and longitude in radians
+    var lat1 = centerLat * (Math.PI / 180);
+    var lng1 = centerLng * (Math.PI / 180);
+    // Offset latitude and longitude
+    var lat2 = Math.asin(Math.sin(lat1) * Math.cos(d / R) +
+        Math.cos(lat1) * Math.sin(d / R) * Math.cos(theta));
+    var lng2 = lng1 + Math.atan2(Math.sin(theta) * Math.sin(d / R) * Math.cos(lat1), Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2));
+    // Convert radians back to degrees
+    return {
+        latitude: lat2 * (180 / Math.PI),
+        longitude: lng2 * (180 / Math.PI)
+    };
+}
 var client_1 = require("@prisma/client");
 var faker_1 = require("@faker-js/faker");
 var prisma = new client_1.PrismaClient();
+// Coordinates of Bengaluru, India
+var BENGALURU_LAT = 12.9716;
+var BENGALURU_LNG = 77.5946;
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var i, user, locationData, location_1, locationError_1, userError_1;
+        var i, user, locationData, location_1, locationResult, locationError_1, userError_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     i = 0;
                     _a.label = 1;
                 case 1:
-                    if (!(i < 1000)) return [3 /*break*/, 10];
+                    if (!(i < 100000)) return [3 /*break*/, 10];
                     _a.label = 2;
                 case 2:
                     _a.trys.push([2, 8, , 9]);
@@ -67,7 +90,7 @@ function main() {
                                 password: faker_1.faker.internet.password(),
                                 firstName: faker_1.faker.person.firstName(),
                                 lastName: faker_1.faker.person.lastName(),
-                                dateOfBirth: faker_1.faker.date.past({ years: 30 }).toISOString(), // Updated syntax
+                                dateOfBirth: faker_1.faker.date.past({ years: 30 }).toISOString(),
                                 gender: faker_1.faker.helpers.arrayElement(Object.values(Gender)),
                                 bio: faker_1.faker.lorem.sentence(),
                                 profilePicture: faker_1.faker.image.avatar(),
@@ -77,9 +100,10 @@ function main() {
                 case 3:
                     user = _a.sent();
                     console.log("Created user with ID: ".concat(user.id));
-                    locationData = {
-                        latitude: faker_1.faker.location.latitude(),
-                        longitude: faker_1.faker.location.longitude(),
+                    locationData = getRandomCoordinates(BENGALURU_LAT, BENGALURU_LNG, 10);
+                    location_1 = {
+                        latitude: locationData.latitude,
+                        longitude: locationData.longitude,
                         localAddress: faker_1.faker.location.streetAddress(),
                         city: faker_1.faker.location.city(),
                         state: faker_1.faker.location.state(),
@@ -88,10 +112,10 @@ function main() {
                     _a.label = 4;
                 case 4:
                     _a.trys.push([4, 6, , 7]);
-                    return [4 /*yield*/, prisma.$executeRaw(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n          INSERT INTO \"Location\" (\n            id, latitude, longitude, coordinates, \"localAddress\", city, state, country, \"userId\", \"createdAt\", \"updatedAt\"\n          )\n          VALUES (\n            gen_random_uuid(),\n            ", ",\n            ", ",\n            ST_SetSRID(ST_MakePoint(", ", ", "), 4326),\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            CURRENT_TIMESTAMP,\n            CURRENT_TIMESTAMP\n          )\n          ON CONFLICT (\"userId\")\n          DO UPDATE SET\n            latitude = EXCLUDED.latitude,\n            longitude = EXCLUDED.longitude,\n            coordinates = EXCLUDED.coordinates,\n            \"localAddress\" = EXCLUDED.\"localAddress\",\n            city = EXCLUDED.city, \n            state = EXCLUDED.state,\n            country = EXCLUDED.country,\n            \"updatedAt\" = CURRENT_TIMESTAMP\n          RETURNING id, latitude, longitude, \"localAddress\", city, state, country, \"updatedAt\"\n        "], ["\n          INSERT INTO \"Location\" (\n            id, latitude, longitude, coordinates, \"localAddress\", city, state, country, \"userId\", \"createdAt\", \"updatedAt\"\n          )\n          VALUES (\n            gen_random_uuid(),\n            ", ",\n            ", ",\n            ST_SetSRID(ST_MakePoint(", ", ", "), 4326),\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            CURRENT_TIMESTAMP,\n            CURRENT_TIMESTAMP\n          )\n          ON CONFLICT (\"userId\")\n          DO UPDATE SET\n            latitude = EXCLUDED.latitude,\n            longitude = EXCLUDED.longitude,\n            coordinates = EXCLUDED.coordinates,\n            \"localAddress\" = EXCLUDED.\"localAddress\",\n            city = EXCLUDED.city, \n            state = EXCLUDED.state,\n            country = EXCLUDED.country,\n            \"updatedAt\" = CURRENT_TIMESTAMP\n          RETURNING id, latitude, longitude, \"localAddress\", city, state, country, \"updatedAt\"\n        "])), locationData.latitude, locationData.longitude, locationData.longitude, locationData.latitude, locationData.localAddress, locationData.city, locationData.state, locationData.country, user.id)];
+                    return [4 /*yield*/, prisma.$executeRaw(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n          INSERT INTO \"Location\" (\n            id, latitude, longitude, coordinates, \"localAddress\", city, state, country, \"userId\", \"createdAt\", \"updatedAt\"\n          )\n          VALUES (\n            gen_random_uuid(),\n            ", ",\n            ", ",\n            ST_SetSRID(ST_MakePoint(", ", ", "), 4326),\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            CURRENT_TIMESTAMP,\n            CURRENT_TIMESTAMP\n          )\n          ON CONFLICT (\"userId\")\n          DO UPDATE SET\n            latitude = EXCLUDED.latitude,\n            longitude = EXCLUDED.longitude,\n            coordinates = EXCLUDED.coordinates,\n            \"localAddress\" = EXCLUDED.\"localAddress\",\n            city = EXCLUDED.city, \n            state = EXCLUDED.state,\n            country = EXCLUDED.country,\n            \"updatedAt\" = CURRENT_TIMESTAMP\n          RETURNING id, latitude, longitude, \"localAddress\", city, state, country, \"updatedAt\"\n        "], ["\n          INSERT INTO \"Location\" (\n            id, latitude, longitude, coordinates, \"localAddress\", city, state, country, \"userId\", \"createdAt\", \"updatedAt\"\n          )\n          VALUES (\n            gen_random_uuid(),\n            ", ",\n            ", ",\n            ST_SetSRID(ST_MakePoint(", ", ", "), 4326),\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            ", ",\n            CURRENT_TIMESTAMP,\n            CURRENT_TIMESTAMP\n          )\n          ON CONFLICT (\"userId\")\n          DO UPDATE SET\n            latitude = EXCLUDED.latitude,\n            longitude = EXCLUDED.longitude,\n            coordinates = EXCLUDED.coordinates,\n            \"localAddress\" = EXCLUDED.\"localAddress\",\n            city = EXCLUDED.city, \n            state = EXCLUDED.state,\n            country = EXCLUDED.country,\n            \"updatedAt\" = CURRENT_TIMESTAMP\n          RETURNING id, latitude, longitude, \"localAddress\", city, state, country, \"updatedAt\"\n        "])), location_1.latitude, location_1.longitude, location_1.longitude, location_1.latitude, location_1.localAddress, location_1.city, location_1.state, location_1.country, user.id)];
                 case 5:
-                    location_1 = _a.sent();
-                    console.log("Created or updated location with ID: ".concat(location_1));
+                    locationResult = _a.sent();
+                    console.log("Created or updated location with ID: ".concat(locationResult));
                     return [3 /*break*/, 7];
                 case 6:
                     locationError_1 = _a.sent();

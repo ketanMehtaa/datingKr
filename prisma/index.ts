@@ -18,6 +18,8 @@ export const prisma =
   globalThis.prisma ||
   new PrismaClient({
     datasourceUrl: db,
+    log: ['query', 'info', 'warn', 'error'],
+
   });
 
 export const getPrismaClient = () => prisma;

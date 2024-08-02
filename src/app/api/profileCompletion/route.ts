@@ -17,12 +17,11 @@ export async function POST(req: Request) {
     const dateOfBirth = new Date(data.dateOfBirth);
 
     // Update the user record and create/update location
-    const updatedUser = await prisma.$transaction(async () => {
+    const updatedUser = await prisma.$transaction(async (prisma) => {
       // Update user
-      const user = await prisma.user.create({
+      const user = await prisma.user.update({
         where: { email: session.user.email },
         data: {
-          email:
           firstName: data.firstName,
           lastName: data.lastName,
           dateOfBirth: dateOfBirth,
