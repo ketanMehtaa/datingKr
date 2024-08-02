@@ -1,107 +1,38 @@
-'use client';
-// pages/index.tsx
+'use client'
 import Head from 'next/head';
-import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import axios from 'axios';
-import { useEffect, useCallback } from 'react';
-
 
 interface Profile {
-  id: number;
-  name: string;
-  age: number;
-  image: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  profilePicture: string;
+  city: string;
+  state: string;
+  country: string;
+  distance: number;
 }
 
 export default function Home() {
-  const [profiles, setProfiles] = useState<Profile[]>([
-    {
-      id: 1,
-      name: 'John Doe',
-      age: 25,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/beautiful-girl-photo_13.jpg',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      age: 28,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/indian-girl-photo_15.jpg',
-    },
-    {
-      id: 1,
-      name: 'John Doe',
-      age: 25,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/beautiful-girl-photo_13.jpg',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      age: 28,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/indian-girl-photo_15.jpg',
-    },
+  const [profiles, setProfiles] = useState<Profile[]>([]);
 
-    {
-      id: 1,
-      name: 'John Doe',
-      age: 25,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/beautiful-girl-photo_13.jpg',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      age: 28,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/indian-girl-photo_15.jpg',
-    },
-
-    {
-      id: 1,
-      name: 'John Doe',
-      age: 25,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/beautiful-girl-photo_13.jpg',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      age: 28,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/indian-girl-photo_15.jpg',
-    },
-
-    {
-      id: 1,
-      name: 'John Doe',
-      age: 25,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/beautiful-girl-photo_13.jpg',
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      age: 28,
-      image: 'https://photosnow.org/wp-content/uploads/2024/04/indian-girl-photo_15.jpg',
-    },
-  ]);
-  
   useEffect(() => {
-    // Define the async function
     const fetchData = async () => {
       try {
         const response = await axios.get('/api/recommendation', {
           headers: { 'Content-Type': 'application/json' },
         });
         console.log('Response data:', response.data);
-        // setData(response.data); // Set the response data to state
+        setProfiles(response.data);
       } catch (err) {
         console.error('Error fetching data:', err);
-        // setError(err.message); // Set error message to state
-      } finally {
-        // setLoading(false); // Set loading to false once data is fetched or an error occurs
       }
     };
 
-    // Call the async function
     fetchData();
-  }, []); // Empty dependency array means this effect runs once after initial render
+  }, []);
 
   const controls = useAnimation();
 
@@ -128,14 +59,12 @@ export default function Home() {
       </Head>
 
       <div className="flex flex-col min-h-screen bg-gray-100">
-        {/* Header */}
         <header className="fixed top-0 left-0 w-full bg-white shadow-md p-4 z-10">
           <div className="container mx-auto">
             <h1 className="text-2xl font-bold">Dating App</h1>
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-grow pt-20 pb-16 flex justify-center items-center">
           {profiles.length > 0 && (
             <motion.div
@@ -145,8 +74,8 @@ export default function Home() {
               dragConstraints={{ left: -300, right: 300 }}
               dragElastic={0.1}
               onDragEnd={(event, info) => {
-                const swipeThreshold = 150; // Minimum distance for swipe to be considered valid
-                const swipeVelocityThreshold = 500; // Minimum velocity for swipe to be considered valid
+                const swipeThreshold = 150;
+                const swipeVelocityThreshold = 500;
                 const distance = Math.abs(info.offset.x);
                 const velocity = info.velocity.x;
 
@@ -157,17 +86,17 @@ export default function Home() {
                 }
               }}
             >
-
-              <Image
-                src={profiles[0].image}
+              <img
+                src={profiles[0].profilePicture}
                 alt="Profile Picture"
                 width={400}
                 height={400}
                 className="w-full h-64 object-cover rounded-t-lg"
               />
               <div className="p-4">
-                <h2 className="text-xl font-semibold">{profiles[0].name}</h2>
-                <p className="text-gray-600">{profiles[0].age} years old, loves hiking and photography.</p>
+                <h2 className="text-xl font-semibold">{profiles[0].firstName} {profiles[0].lastName}</h2>
+                <p className="text-gray-600">{profiles[0].city}, {profiles[0].state}, {profiles[0].country}</p>
+                <p className="text-gray-600">Distance: {profiles[0].distance.toFixed(2)} km</p>
               </div>
               <div className="absolute inset-x-0 bottom-4 flex justify-between px-4">
                 <button
@@ -187,7 +116,6 @@ export default function Home() {
           )}
         </main>
 
-        {/* Footer */}
         <footer className="fixed bottom-0 left-0 w-full bg-white shadow-md p-4 text-center">
           <div className="container mx-auto">
             <p className="text-gray-600">© 2024 Dating App. All rights reserved.</p>
@@ -197,5 +125,3 @@ export default function Home() {
     </>
   );
 }
-
-
