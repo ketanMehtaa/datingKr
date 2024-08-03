@@ -8,7 +8,12 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-const db = process.env.DATABASE_URL;
+// todo  vercel and non vercel
+// const db = process.env.DATABASE_URL;
+
+const db = process.env.POSTGRES_URL;
+
+
 if (!globalThis.prisma) {
   // console.log('db in prisma index.ts', db);
   globalThis.prisma = new PrismaClient({ datasourceUrl: db });
