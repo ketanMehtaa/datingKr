@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session || !session.user?.email) {
+    if (!session?.user?.email) {
       return new NextResponse('Unauthenticated session not found', { status: 401 });
     }
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     const updatedUser = await prisma.$transaction(async (prisma) => {
       const user = await prisma.user.update({
-        where: { email: session.user.email },
+        where: { email: session?.user?.email || "todo" },
         data: {
           firstName: data.firstName,
           lastName: data.lastName,
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
           isPrivate: false,
         })),
       });
-
+      // @ts-ignore
       return { ...user, location: location[0], photos: userPhotos };
     });
 
@@ -97,7 +97,7 @@ async function getPresignedPostUrl(filename: string, contentType: string) {
   const sanitizedFilename = sanitizeFilename(filename);
 
   const { url, fields } = await createPresignedPost(client, {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.AWS_BUCKET_NAME ||"aws bucket name in env not found or aws bucket not found",
     Key: `${uuidv4()}-${sanitizedFilename}`,
     Conditions: [
       ['content-length-range', 0, 10485760], // up to 10 MB

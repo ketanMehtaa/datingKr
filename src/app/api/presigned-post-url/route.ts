@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const client = new S3Client({ region: process.env.AWS_REGION });
 
     const { url, fields } = await createPresignedPost(client, {
-      Bucket: process.env.AWS_BUCKET_NAME,
+      Bucket: process?.env?.AWS_BUCKET_NAME || "null",
       Key: uuidv4() + '-' + filename, // Ensures unique key for each file
       Conditions: [
         ['content-length-range', 0, 10485760], // up to 10 MB
@@ -24,8 +24,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ url, fields });
-  } catch (error) {
+  } catch (error:any) {
     console.error('Error generating presigned POST URL:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error?.message }, { status: 500 });
   }
 }
