@@ -8,7 +8,7 @@ interface Profile {
   id: string;
   firstName: string;
   lastName: string;
-  profilePicture: string;
+  photos: { url: string }[]; // Change from profilePicture to photos
   city: string;
   state: string;
   country: string;
@@ -49,6 +49,8 @@ export default function Home() {
       });
   };
 
+  const currentProfile = profiles[0];
+  
   return (
     <>
       <Head>
@@ -66,7 +68,7 @@ export default function Home() {
         </header>
 
         <main className="flex-grow pt-20 pb-16 flex justify-center items-center">
-          {profiles.length > 0 && (
+          {currentProfile && (
             <motion.div
               animate={controls}
               className="relative w-full max-w-sm bg-white p-4 rounded-lg shadow-lg"
@@ -86,17 +88,25 @@ export default function Home() {
                 }
               }}
             >
-              <img
-                src={profiles[0].profilePicture}
-                alt="Profile Picture"
-                width={400}
-                height={400}
-                className="w-full h-64 object-cover rounded-t-lg"
-              />
+              <div className="relative">
+                {/* Carousel for photos? */}
+                {currentProfile?.photos?.length > 0 && (
+                  <div className="carousel">
+                    {currentProfile?.photos?.map((photo, index) => (
+                      <img
+                        key={index}
+                        src={photo.url}
+                        alt={`Photo ${index + 1}`}
+                        className={`absolute w-full h-64 object-cover rounded-t-lg transition-transform duration-300 ease-in-out ${index === 0 ? 'translate-x-0' : '-translate-x-full'}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
               <div className="p-4">
-                <h2 className="text-xl font-semibold">{profiles[0].firstName} {profiles[0].lastName}</h2>
-                <p className="text-gray-600">{profiles[0].city}, {profiles[0].state}, {profiles[0].country}</p>
-                <p className="text-gray-600">Distance: {profiles[0].distance.toFixed(2)} km</p>
+                <h2 className="text-xl font-semibold">{currentProfile?.firstName} {currentProfile?.lastName}</h2>
+                <p className="text-gray-600">{currentProfile?.city}, {currentProfile?.state}, {currentProfile?.country}</p>
+                <p className="text-gray-600">Distance: {currentProfile?.distance.toFixed(2)} km</p>
               </div>
               <div className="absolute inset-x-0 bottom-4 flex justify-between px-4">
                 <button

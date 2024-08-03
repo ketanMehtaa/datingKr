@@ -1,5 +1,3 @@
-// import { getServerSession } from 'next-auth';
-// import { authOptions } from '../auth/[...nextauth]/route';
 import { NextResponse } from 'next/server';
 import { auth } from '../auth/[...nextauth]/auth';
 import { prisma } from '../../../../prisma/index';
@@ -33,7 +31,7 @@ export async function GET(req: Request) {
         u.id, 
         u."firstName",
         u."lastName",
-        u."profilePicture",
+        up.url as "profilePicture",  -- Change to use UserPhoto
         l.city,
         l.state,
         l.country,
@@ -43,6 +41,7 @@ export async function GET(req: Request) {
         ) as distance
       FROM "User" u
       JOIN "Location" l ON u.id = l."userId"
+      LEFT JOIN "UserPhoto" up ON u.id = up."userId" AND up."isPrivate" = false  -- Fetch user photos
       WHERE u.email != ${session.user.email}
         AND ST_DWithin(
           l.coordinates::geography,
@@ -54,8 +53,14 @@ export async function GET(req: Request) {
     ORDER BY RANDOM()  -- Randomize the order of results
     LIMIT 10;
   `;
-  
-    return new NextResponse(JSON.stringify(nearbyUsers), {
+
+    // Process the result to include user photos in the response
+    const result = nearbyUsers.map(user => ({
+      ...user,
+      photos: [{ url: user.profilePicture }], // Map profilePicture to photos array
+    }));
+
+    return new NextResponse(JSON.stringify(result), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
