@@ -93,7 +93,7 @@ function main() {
                                 dateOfBirth: faker_1.faker.date.past({ years: 30 }).toISOString(),
                                 gender: faker_1.faker.helpers.arrayElement(Object.values(Gender)),
                                 bio: faker_1.faker.lorem.sentence(),
-                                profilePicture: faker_1.faker.image.avatar(),
+                                // profilePicture: faker_1.faker.image.avatar(),
                                 profileCompleted: faker_1.faker.datatype.boolean(),
                             }
                         })];

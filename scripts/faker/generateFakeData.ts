@@ -52,7 +52,7 @@ async function main() {
           dateOfBirth: faker.date.past({ years: 30 }).toISOString(),
           gender: faker.helpers.arrayElement(Object.values(Gender)),
           bio: faker.lorem.sentence(),
-          profilePicture: faker.image.avatar(),
+          // profilePicture: faker.image.avatar(),
           profileCompleted: faker.datatype.boolean(),
         }
       });

@@ -31,7 +31,6 @@ export async function GET(req: Request) {
         u.id, 
         u."firstName",
         u."lastName",
-        up.url as "profilePicture",  -- Change to use UserPhoto
         l.city,
         l.state,
         l.country,
@@ -41,26 +40,37 @@ export async function GET(req: Request) {
         ) as distance
       FROM "User" u
       JOIN "Location" l ON u.id = l."userId"
-      LEFT JOIN "UserPhoto" up ON u.id = up."userId" AND up."isPrivate" = false  -- Fetch user photos
       WHERE u.email != ${session.user.email}
         AND ST_DWithin(
           l.coordinates::geography,
           ST_SetSRID(ST_MakePoint(${userLocation.location.longitude}, ${userLocation.location.latitude}), 4326)::geography,
           50000  -- 50km radius
         )
+    ),
+    UserPhotos AS (
+      SELECT 
+        up."userId",
+        json_agg(json_build_object('url', up.url)) as photos
+      FROM "UserPhoto" up
+      WHERE up."isPrivate" = false
+      GROUP BY up."userId"
     )
-    SELECT * FROM UserDistances
+    SELECT 
+      ud.id,
+      ud."firstName",
+      ud."lastName",
+      ud.city,
+      ud.state,
+      ud.country,
+      ud.distance,
+      up.photos
+    FROM UserDistances ud
+    LEFT JOIN UserPhotos up ON ud.id = up."userId"
     ORDER BY RANDOM()  -- Randomize the order of results
     LIMIT 10;
   `;
 
-    // Process the result to include user photos in the response
-    const result = nearbyUsers.map(user => ({
-      ...user,
-      photos: [{ url: user.profilePicture }], // Map profilePicture to photos array
-    }));
-
-    return new NextResponse(JSON.stringify(result), {
+    return new NextResponse(JSON.stringify(nearbyUsers), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
