@@ -1,11 +1,12 @@
 'use client'
 import Head from 'next/head';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import axios from 'axios';
 import { cn } from "@/lib/utils"
 import { Slider } from "@/components/ui/slider"
 import debounce from 'lodash/debounce';
+
 interface Profile {
   id: string;
   firstName: string;
@@ -17,7 +18,6 @@ interface Profile {
   distance: number;
 }
 
-
 type SliderProps = React.ComponentProps<typeof Slider>
 
 export default function Home() {
@@ -26,22 +26,9 @@ export default function Home() {
   const [value, setValue] = useState([5]);
 
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get('/api/recommendation', {
-  //         headers: { 'Content-Type': 'application/json' },
-  //         params: { maxDistance: value[0] * 1000 }
-  //       });
-  //       console.log('Response data:', response.data);
-  //       setProfiles(response.data);
-  //     } catch (err) {
-  //       console.error('Error fetching data:', err);
-  //     }
-  //   };
+  const nextProfileRef = useRef<HTMLDivElement>(null);
 
-  //   fetchData();
-  // }, [value[0]]);
+
   const fetchData = useCallback(async (distance: number) => {
     try {
       const response = await axios.get('/api/recommendation', {
@@ -84,17 +71,10 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Dating App</title>
-        <meta name="description" content="Dating app home page" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-      </Head>
-
       <div className="flex flex-col min-h-screen bg-gray-100">
         <header className="fixed top-0 left-0 w-full bg-white shadow-md p-4 z-10">
           <div className="container mx-auto">
-            <h1 className="text-2xl font-bold">Dating App</h1>
+            <h1 className="text-2xl font-bold">Hamy</h1>
           </div>
         </header>
         <div className="flex flex-col items-center mt-20">
@@ -115,10 +95,11 @@ export default function Home() {
           {currentProfile && (
             <motion.div
               animate={controls}
-              className="relative w-full max-w-md bg-white p-4 rounded-lg shadow-lg"
+              className="relative w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden"
               drag="x"
               dragConstraints={{ left: -300, right: 300 }}
               dragElastic={0.1}
+
               onDragEnd={(event, info) => {
                 const swipeThreshold = 150;
                 const swipeVelocityThreshold = 500;
@@ -133,25 +114,21 @@ export default function Home() {
               }}
             >
               <div className="p-4">
-                {/* User Info */}
                 <h2 className="text-xl font-semibold">{currentProfile?.firstName} {currentProfile?.lastName}</h2>
                 <p className="text-gray-600">{currentProfile?.city}, {currentProfile?.state}, {currentProfile?.country}</p>
                 <p className="text-gray-600">Distance: {(currentProfile?.distance / 1000).toFixed(2)} km</p>
               </div>
 
-              {/* Horizontal Scrolling Photos */}
-              <div className="relative">
+              <div className="relative flex flex-col">
                 {currentProfile?.photos?.length > 0 && (
-                  <div className="overflow-x-auto whitespace-nowrap">
-                    {currentProfile.photos.map((photo, index) => (
-                      <img
-                        key={index}
-                        src={photo.url}
-                        alt={`Photo ${index + 1}`}
-                        className="inline-block w-64 h-64 object-cover rounded-lg mx-2"
-                      />
-                    ))}
-                  </div>
+                  currentProfile.photos.map((photo, index) => (
+                    <img
+                      key={index}
+                      src={photo.url}
+                      alt={`Photo ${index + 1}`}
+                      className="w-full h-auto object-cover"
+                    />
+                  ))
                 )}
               </div>
 
@@ -171,11 +148,23 @@ export default function Home() {
               </div>
             </motion.div>
           )}
-        </main>
 
+          {/* Preload next profile */}
+          {profiles.length > 1 && (
+            <div ref={nextProfileRef} className="hidden">
+              {profiles[1]?.photos?.map((photo, index) => (
+                <img
+                  key={index}
+                  src={photo.url}
+                  alt={`Next Profile Photo ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </main>
         <footer className="fixed bottom-0 left-0 w-full bg-white shadow-md p-4 text-center">
           <div className="container mx-auto">
-            <p className="text-gray-600">© 2024 Dating App. All rights reserved.</p>
+            <p className="text-gray-600">© 2024 Hamy App. All rights reserved.</p>
           </div>
         </footer>
       </div>

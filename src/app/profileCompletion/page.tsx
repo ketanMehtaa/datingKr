@@ -1,12 +1,20 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axios from 'axios';
-// import useDebounce from '../../components/useDebounce'
 import { useRouter } from 'next/navigation'
+import { CalendarIcon } from "@radix-ui/react-icons"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface FormData {
   firstName: string;
@@ -21,14 +29,6 @@ interface FormData {
   latitude: number;
   longitude: number;
   images: File[];
-}
-
-function toNumberString(num: number) {
-  if (Number.isInteger(num)) {
-    return num + '.0';
-  } else {
-    return num.toString();
-  }
 }
 
 function requestLocationPermission() {
@@ -64,19 +64,43 @@ export default function CompleteProfileForm() {
   });
   const [loading, setLoading] = useState(false);
   const [locationError, setLocationError] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
   const router = useRouter()
+  const [date, setDate] = useState<Date>()
+  const [errors, setErrors] = useState<{ [key: string]: string }>({
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    gender: '',
+    bio: '',
+    localAddress: '',
+    city: '',
+    state: '',
+    country: '',
+    images: '',
+  });
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const filesArray = Array.from(event.target.files);
+    const fileInput = event.target;
+    const files = fileInput.files;
+    if (files) {
+      const remainingSlots = 6 - formData.images.length;
+      const filesToAdd = Array.from(files).slice(0, remainingSlots);
       setFormData(prevState => ({
         ...prevState,
-        images: filesArray
+        images: [...prevState.images, ...filesToAdd]
       }));
+      setErrors((prevErrors) => ({ ...prevErrors, images: '' }));
     }
   };
 
+  const removeImage = (index: number) => {
+    const updatedImages = [...formData.images];
+    updatedImages.splice(index, 1);
+    setFormData((prevState) => ({
+      ...prevState,
+      images: updatedImages,
+    }));
+  };
 
   useEffect(() => {
     requestLocationPermission();
@@ -96,20 +120,8 @@ export default function CompleteProfileForm() {
             const data = res.data;
             const locationData = data.results[0] || {};
 
-            // setFormData((prevState) => ({
-            //   ...prevState,
-            //   latitude,
-            //   longitude,
-            //   localAddress: locationData.formatted_address || '',
-            //   city: locationData.address_components.find((comp) => comp.types.includes('locality'))?.long_name || '',
-            //   state:
-            //     locationData.address_components.find((comp) => comp.types.includes('administrative_area_level_1'))
-            //       ?.long_name || '',
-            //   country: locationData.address_components.find((comp) => comp.types.includes('country'))?.long_name || '',
-            // }));
             setFormData((prevState: FormData) => ({
               ...prevState,
-              // todo uncommment latitude and longitude
               latitude,
               longitude,
               localAddress: locationData.formatted_address || '',
@@ -137,82 +149,96 @@ export default function CompleteProfileForm() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (debouncedSearch) {
-  //     fetch(`/api/search?q=${debouncedSearch}`)
-  //   }
-  // }, [debouncedSearch])
-  // return <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
-
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newImages = Array.from(e.target.files);
-      setFormData((prevState) => ({
-        ...prevState,
-        images: [...prevState.images, ...newImages],
-      }));
-    }
+  const handleDateChange = (newDate: any) => {
+    const offsetDate = new Date(newDate.getTime() - (newDate.getTimezoneOffset() * 60000));
+
+    setDate(offsetDate);
+    setFormData((prevState) => ({
+      ...prevState,
+      dateOfBirth: offsetDate.toISOString(),
+    }));
+    setErrors((prevErrors) => ({ ...prevErrors, dateOfBirth: '' }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-  
+
+    const validationErrors: { [key: string]: string } = {};
+    for (const key in formData) {
+      if (key === 'images' || key === 'latitude' || key === 'longitude') {
+        continue;
+      }
+      // @ts-ignore
+      if (!formData[key]) {
+        validationErrors[key] = `${key.charAt(0).toUpperCase() + key.slice(1)} is required`;
+      }
+    }
+    if (formData.images.length < 2) {
+      validationErrors.images = 'At least 2 images are required';
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setLoading(false);
+      return;
+    }
+
     try {
       console.log("FormData before submission:", formData);
-  
+
       const imageData = formData.images?.map(file => ({
         filename: file.name,
         contentType: file.type
       })) || [];
-  
+
       console.log("Image data prepared for submission:", imageData);
-  
+
       const resProfile = await axios.post('/api/profileCompletion', {
         ...formData,
         images: imageData
       }, {
         headers: { 'Content-Type': 'application/json' },
       });
-  
+
       console.log("Response from profileCompletion API:", resProfile.data);
-  
+
       if (resProfile.status === 200) {
         const { imageUploadUrls } = resProfile.data;
-  
+
         console.log("Received imageUploadUrls:", imageUploadUrls);
-  
+
         if (!Array.isArray(imageUploadUrls) || imageUploadUrls.length === 0) {
           console.error("No valid imageUploadUrls received");
-          // Handle this error case (e.g., show an error message to the user)
           return;
         }
-  
+
         for (let i = 0; i < imageUploadUrls.length; i++) {
           const uploadData = imageUploadUrls[i];
           const file = formData.images?.[i];
-  
+
           if (!file) {
             console.error(`No file found for index ${i}`);
             continue;
           }
-  
+
           console.log(`Preparing to upload file: ${file.name}`);
-  
+
           let formData_new = new FormData();
           Object.entries(uploadData.fields).forEach(([key, value]) => {
             formData_new.append(key, value as string);
           });
           formData_new.append('file', file);
-  
+
           try {
             const uploadResponse = await axios.post(uploadData.url, formData_new, {
               headers: { 'Content-Type': 'multipart/form-data' },
@@ -220,10 +246,9 @@ export default function CompleteProfileForm() {
             console.log(`Successfully uploaded image ${i + 1}`, uploadResponse.status);
           } catch (error) {
             console.error(`Failed to upload image ${i + 1}:`, error);
-            // Handle error (e.g., show message to user)
           }
         }
-  
+
         console.log('All uploads completed, redirecting to dashboard');
         router.push('/dashboard');
       } else {
@@ -231,18 +256,17 @@ export default function CompleteProfileForm() {
       }
     } catch (error) {
       console.error('Error in handleSubmit:', error);
-      // Handle error (e.g., show an error message to the user)
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="mt-3 p-6 max-w-md mx-auto bg-white rounded-lg shadow-xl">
       <h1 className="text-2xl font-semibold mb-4">Complete Your Profile</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           name="firstName"
-          // label="First Name"
           type="text"
           placeholder="Enter your first name"
           value={formData.firstName}
@@ -250,9 +274,10 @@ export default function CompleteProfileForm() {
           required
           className="w-full"
         />
+        {errors.firstName && <div className="text-red-500 text-sm mt-1">{errors.firstName}</div>}
+
         <Input
           name="lastName"
-          // label="Last Name"
           type="text"
           placeholder="Enter your last name"
           value={formData.lastName}
@@ -260,16 +285,33 @@ export default function CompleteProfileForm() {
           required
           className="w-full"
         />
-        <Input
-          name="dateOfBirth"
-          // label="Date of Birth"
-          type="date"
-          value={formData.dateOfBirth}
-          onChange={handleChange}
-          required
-          className="w-full"
-        />
-        {/* todo required not working in gender */}
+        {errors.lastName && <div className="text-red-500 text-sm mt-1">{errors.lastName}</div>}
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date ? format(date, "PPP") : <span>Date of Birth {formData.dateOfBirth}</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              required
+              mode="single"
+              selected={date}
+              onSelect={handleDateChange}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        {errors.dateOfBirth && <div className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</div>}
+
         <Select
           name="gender"
           value={formData.gender}
@@ -288,6 +330,8 @@ export default function CompleteProfileForm() {
             <SelectItem value="PREFER_NOT_TO_SAY">Prefer Not To Say</SelectItem>
           </SelectContent>
         </Select>
+        {errors.gender && <div className="text-red-500 text-sm mt-1">{errors.gender}</div>}
+
         <Textarea
           name="bio"
           placeholder="Write something about yourself"
@@ -295,14 +339,8 @@ export default function CompleteProfileForm() {
           onChange={handleChange}
           className="w-full"
         />
-        {/* <Input
-          name="profilePicture"
-          type="url"
-          placeholder="Enter profile picture URL"
-          value={formData.profilePicture}
-          onChange={handleChange}
-          className="w-full"
-        /> */}
+        {errors.bio && <div className="text-red-500 text-sm mt-1">{errors.bio}</div>}
+
         <Input
           name="localAddress"
           type="text"
@@ -312,29 +350,7 @@ export default function CompleteProfileForm() {
           className="w-full"
           required
         />
-        {/* <div className="relative">
-          <Input
-            name="localAddress"
-            type="text"
-            placeholder="Local Address"
-            value={formData.localAddress}
-            onChange={handleChange}
-            className="w-full"
-          />
-          {suggestions.length > 0 && (
-            <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded-md shadow-lg">
-              {suggestions.map((suggestion, index) => (
-                <li
-                  key={index}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleSuggestionSelect(suggestion)}
-                >
-                  {suggestion?.formatted_address}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div> */}
+        {errors.localAddress && <div className="text-red-500 text-sm mt-1">{errors.localAddress}</div>}
 
         <Input
           name="city"
@@ -345,6 +361,8 @@ export default function CompleteProfileForm() {
           className="w-full"
           required
         />
+        {errors.city && <div className="text-red-500 text-sm mt-1">{errors.city}</div>}
+
         <Input
           name="state"
           type="text"
@@ -354,6 +372,8 @@ export default function CompleteProfileForm() {
           className="w-full"
           required
         />
+        {errors.state && <div className="text-red-500 text-sm mt-1">{errors.state}</div>}
+
         <Input
           name="country"
           type="text"
@@ -363,32 +383,48 @@ export default function CompleteProfileForm() {
           className="w-full"
           required
         />
-        <div>
-          <label htmlFor="image-upload" className="block text-sm font-medium text-gray-700">
-            Upload Profile Pictures
-          </label>
-          {/* <input
-            id="image-upload" 
-            name="images"
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="mt-1 block w-full text-sm text-slate-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-full file:border-0
-              file:text-sm file:font-semibold
-              file:bg-violet-50 file:text-violet-700
-              hover:file:bg-violet-100"
-          /> */}
-          <input
-            type="file"
-            multiple
-            onChange={handleImageChange}
-            accept="image/*"
-          />
+        {errors.country && <div className="text-red-500 text-sm mt-1">{errors.country}</div>}
 
+        {/* Image Upload Section with "+" signs and preview */}
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          {formData.images.map((image, index) => (
+            <div key={index} className="relative aspect-square">
+              <img
+                src={URL.createObjectURL(image)}
+                alt={`Image ${index}`}
+                className="w-full h-full object-cover rounded-md"
+              />
+              <button
+                className="absolute top-1 right-1 bg-gray-200 p-1 rounded-full text-gray-600 hover:bg-gray-300"
+                onClick={() => removeImage(index)}
+                type="button"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
+                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                </svg>
+              </button>
+            </div>
+          ))}
+          
+          {[...Array(Math.min(6 - formData.images.length, 6))].map((_, index) => (
+            <label 
+              key={`upload-${index}`} 
+              htmlFor={`image-upload-${index}`} 
+              className="cursor-pointer aspect-square flex items-center justify-center bg-gray-200 rounded-md"
+            >
+              <span className="text-gray-400 font-medium text-4xl">+</span>
+              <input
+                type="file"
+                id={`image-upload-${index}`}
+                accept="image/*"
+                onChange={handleImageChange}
+                hidden
+              />
+            </label>
+          ))}
         </div>
+        {errors.images && <div className="text-red-500 text-sm mt-1">{errors.images}</div>}
+
         {locationError && <p className="text-red-500">{locationError}</p>}
         <Button type="submit" className="w-full bg-pink-700 text-white hover:bg-pink-700">
           {loading ? 'Saving...' : 'Save'}
