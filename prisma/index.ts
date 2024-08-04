@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { withOptimize } from "@prisma/extension-optimize";
 
 // import { getDatabaseUrl } from './helper';
 
@@ -17,7 +16,7 @@ const db = process.env.POSTGRES_URL;
 
 if (!globalThis.prisma) {
   // console.log('db in prisma index.ts', db);
-  globalThis.prisma = new PrismaClient({ datasourceUrl: db }).$extends(withOptimize())  as PrismaClient;;
+  globalThis.prisma = new PrismaClient({ datasourceUrl: db });
 }
 
 export const prisma =

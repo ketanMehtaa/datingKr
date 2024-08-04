@@ -8,8 +8,7 @@
 // }
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions","tracing"]
-  
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 // datasource db {
