@@ -1,9 +1,11 @@
 'use client'
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import axios from 'axios';
-
+import { cn } from "@/lib/utils"
+import { Slider } from "@/components/ui/slider"
+import debounce from 'lodash/debounce';
 interface Profile {
   id: string;
   firstName: string;
@@ -15,25 +17,53 @@ interface Profile {
   distance: number;
 }
 
+
+type SliderProps = React.ComponentProps<typeof Slider>
+
 export default function Home() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [value, setValue] = useState([5]);
+
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get('/api/recommendation', {
+  //         headers: { 'Content-Type': 'application/json' },
+  //         params: { maxDistance: value[0] * 1000 }
+  //       });
+  //       console.log('Response data:', response.data);
+  //       setProfiles(response.data);
+  //     } catch (err) {
+  //       console.error('Error fetching data:', err);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [value[0]]);
+  const fetchData = useCallback(async (distance: number) => {
+    try {
+      const response = await axios.get('/api/recommendation', {
+        headers: { 'Content-Type': 'application/json' },
+        params: { maxDistance: distance * 1000 }
+      });
+      console.log('Response data:', response.data);
+      setProfiles(response.data);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    }
+  }, []);
+
+  const debouncedFetchData = useCallback(
+    debounce((distance: number) => fetchData(distance), 1000),
+    [fetchData]
+  );
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/api/recommendation', {
-          headers: { 'Content-Type': 'application/json' },
-        });
-        console.log('Response data:', response.data);
-        setProfiles(response.data);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-      }
-    };
+    debouncedFetchData(value[0]);
+  }, [value[0], debouncedFetchData]);
 
-    fetchData();
-  }, []);
 
   const controls = useAnimation();
 
@@ -67,6 +97,19 @@ export default function Home() {
             <h1 className="text-2xl font-bold">Dating App</h1>
           </div>
         </header>
+        <div className="flex flex-col items-center mt-20">
+          <Slider
+            min={0}
+            max={3000}
+            step={0.1}
+            className={cn("w-[60%]")}
+            value={value}
+            onValueChange={(newValue) => setValue(newValue)}
+          />
+          <p className="mt-2">
+            {value[0]} km
+          </p>
+        </div>
 
         <main className="flex-grow pt-20 pb-16 flex justify-center items-center">
           {currentProfile && (
@@ -94,7 +137,7 @@ export default function Home() {
                 <h2 className="text-xl font-semibold">{currentProfile?.firstName} {currentProfile?.lastName}</h2>
                 <p className="text-gray-600">{currentProfile?.city}, {currentProfile?.state}, {currentProfile?.country}</p>
                 <p className="text-gray-600">Distance: {(currentProfile?.distance / 1000).toFixed(2)} km</p>
-                </div>
+              </div>
 
               {/* Horizontal Scrolling Photos */}
               <div className="relative">

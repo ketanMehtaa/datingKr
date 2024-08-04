@@ -9,6 +9,10 @@ export async function GET(req: Request) {
       return new NextResponse('Unauthenticated session not found', { status: 401 });
     }
 
+    // Parse the maxDistance from the request URL
+    const url = new URL(req.url);
+    const maxDistance = parseInt(url.searchParams.get('maxDistance') || '50000', 10);
+
     const userLocation = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: {
@@ -44,7 +48,7 @@ export async function GET(req: Request) {
         AND ST_DWithin(
           l.coordinates::geography,
           ST_SetSRID(ST_MakePoint(${userLocation.location.longitude}, ${userLocation.location.latitude}), 4326)::geography,
-          50000  -- 50km radius
+          ${maxDistance}  -- Use the maxDistance parameter
         )
     ),
     UserPhotos AS (
