@@ -93,8 +93,8 @@ export default function Home() {
                 {/* User Info */}
                 <h2 className="text-xl font-semibold">{currentProfile?.firstName} {currentProfile?.lastName}</h2>
                 <p className="text-gray-600">{currentProfile?.city}, {currentProfile?.state}, {currentProfile?.country}</p>
-                <p className="text-gray-600">Distance: {currentProfile?.distance.toFixed(2)} km</p>
-              </div>
+                <p className="text-gray-600">Distance: {(currentProfile?.distance / 1000).toFixed(2)} km</p>
+                </div>
 
               {/* Horizontal Scrolling Photos */}
               <div className="relative">
