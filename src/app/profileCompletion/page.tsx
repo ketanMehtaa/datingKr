@@ -16,7 +16,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-
 import Cropper from 'react-easy-crop';
 
 interface FormData {
@@ -57,7 +56,7 @@ export default function CompleteProfileForm() {
 
   const [currentImageIndex, setCurrentImageIndex] = useState<number | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(2);
+  const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   useEffect(() => {
@@ -440,7 +439,7 @@ export default function CompleteProfileForm() {
 
       {currentImageIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg" style={{ width: '100%', height: '400px' }}>
+          <div className="bg-white p-4 rounded-lg" style={{ width: '80%', height: '80%' }}>
             <div className="relative h-full">
               <Cropper
                 image={formData.images[currentImageIndex] as string}
