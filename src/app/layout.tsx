@@ -4,6 +4,7 @@ import { CSPostHogProvider } from './providers';
 import { cn } from '@/lib/utils';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { NextAuthProvider } from '@/providers/next-auth';
+import { Toaster } from "@/components/ui/toaster"
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -86,7 +87,9 @@ export default function RootLayout({
     <html lang="en" className="no-scrollbar">
       <NextAuthProvider>
         <CSPostHogProvider>
-          <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>{children}</body>
+          <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>{children}
+            <Toaster />
+          </body>
         </CSPostHogProvider>
       </NextAuthProvider>
     </html>

@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-
+import ImageUpload from '../../components/ImageUpload'
 interface FormData {
   firstName: string;
   lastName: string;
@@ -62,6 +62,7 @@ export default function CompleteProfileForm() {
     longitude: 0,
     images: [] as File[],
   });
+
   const [loading, setLoading] = useState(false);
   const [locationError, setLocationError] = useState('');
   const router = useRouter()
@@ -79,27 +80,36 @@ export default function CompleteProfileForm() {
     images: '',
   });
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fileInput = event.target;
-    const files = fileInput.files;
-    if (files) {
-      const remainingSlots = 6 - formData.images.length;
-      const filesToAdd = Array.from(files).slice(0, remainingSlots);
-      setFormData(prevState => ({
-        ...prevState,
-        images: [...prevState.images, ...filesToAdd]
-      }));
-      setErrors((prevErrors) => ({ ...prevErrors, images: '' }));
-    }
-  };
 
-  const removeImage = (index: number) => {
-    const updatedImages = [...formData.images];
-    updatedImages.splice(index, 1);
-    setFormData((prevState) => ({
+  const handleImageChange = (event: any) => {
+
+    setFormData(prevState => ({
       ...prevState,
-      images: updatedImages,
+      images: [...prevState.images, event]
     }));
+    setErrors((prevErrors) => ({ ...prevErrors, images: '' }));
+  };
+  const handleImageRemove = (id: number) => {
+    setFormData(prevState => {
+      if (id === 1) {
+        // Remove the first image if id is 1
+        return {
+          ...prevState,
+          images: prevState.images.slice(1) // Removes the first image
+        };
+      } else if (id === 2) {
+        // Remove the second image if id is 2
+        return {
+          ...prevState,
+          images: [
+            ...prevState.images.slice(0, 1), // Keep the first image
+            ...prevState.images.slice(2)    // Remove the second image (index 1) and keep the rest
+          ]
+        };
+      }
+      // Return state unmodified if id is not 1 or 2
+      return prevState;
+    });
   };
 
   useEffect(() => {
@@ -385,45 +395,10 @@ export default function CompleteProfileForm() {
         />
         {errors.country && <div className="text-red-500 text-sm mt-1">{errors.country}</div>}
 
-        {/* Image Upload Section with "+" signs and preview */}
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          {formData.images.map((image, index) => (
-            <div key={index} className="relative aspect-square">
-              <img
-                src={URL.createObjectURL(image)}
-                alt={`Image ${index}`}
-                className="w-full h-full object-cover rounded-md"
-              />
-              <button
-                className="absolute top-1 right-1 bg-gray-200 p-1 rounded-full text-gray-600 hover:bg-gray-300"
-                onClick={() => removeImage(index)}
-                type="button"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
-                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                </svg>
-              </button>
-            </div>
-          ))}
-          
-          {[...Array(Math.min(6 - formData.images.length, 6))].map((_, index) => (
-            <label 
-              key={`upload-${index}`} 
-              htmlFor={`image-upload-${index}`} 
-              className="cursor-pointer aspect-square flex items-center justify-center bg-gray-200 rounded-md"
-            >
-              <span className="text-gray-400 font-medium text-4xl">+</span>
-              <input
-                type="file"
-                id={`image-upload-${index}`}
-                accept="image/*"
-                onChange={handleImageChange}
-                hidden
-              />
-            </label>
-          ))}
-        </div>
-        {errors.images && <div className="text-red-500 text-sm mt-1">{errors.images}</div>}
+
+
+        < ImageUpload handleImageChange={handleImageChange} handleImageRemove={handleImageRemove} id={1} key="upload1" />
+        < ImageUpload handleImageChange={handleImageChange} handleImageRemove={handleImageRemove} id={2} key="upload2" />
 
         {locationError && <p className="text-red-500">{locationError}</p>}
         <Button type="submit" className="w-full bg-pink-700 text-white hover:bg-pink-700">
