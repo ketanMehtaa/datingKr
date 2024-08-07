@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 
 const featuredTestimonial = {
   body: `Thanks to LoveConnect, I found my soulmate! The matching algorithm is spot-on, and the user experience is fantastic. Within weeks, I met someone special, and we've been happily together for over a year now.`,

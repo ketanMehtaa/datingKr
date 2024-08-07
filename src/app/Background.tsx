@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import bg from '/public/couple_background.jpg';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { Button } from '@/components/ui/button';
 import { useSession, signIn, signOut } from 'next-auth/react';
 

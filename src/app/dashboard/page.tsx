@@ -6,7 +6,7 @@ import axios from 'axios';
 import { cn } from "@/lib/utils"
 import { Slider } from "@/components/ui/slider"
 import debounce from 'lodash/debounce';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 
