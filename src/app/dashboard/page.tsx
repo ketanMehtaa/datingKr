@@ -27,10 +27,15 @@ export default function Home() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [value, setValue] = useState([5]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const nextProfileRef = useRef<HTMLDivElement>(null);
 
+  const currentProfile = profiles[0];
+  const nextProfile = profiles[1];
+
   const fetchData = useCallback(async (distance: number) => {
+    setIsLoading(true);
     try {
       const response = await axios.get('/api/recommendation', {
         headers: { 'Content-Type': 'application/json' },
@@ -40,6 +45,8 @@ export default function Home() {
       setProfiles(response.data);
     } catch (err) {
       console.error('Error fetching data:', err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -68,10 +75,34 @@ export default function Home() {
       });
   };
 
-  const currentProfile = profiles[0];
-  const nextProfile = profiles[1];
+  const ShimmerEffect = () => (
+    <div className="animate-pulse flex flex-col w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
+      {/* Shimmer for the photo */}
+      <div className="relative w-full h-[400px] bg-gray-300 rounded-t-lg"></div>
+      
+      {/* Shimmer for the fixed profile information */}
+      <div className="flex flex-col items-center p-4 bg-white">
+        <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
+        <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+      </div>
+      
+      {/* Shimmer for the action buttons */}
+      <div className="flex justify-between px-4 pb-4">
+        <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+        <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+      </div>
+    </div>
+  );
 
-  return <>
+  const ComeBackLater = () => (
+    <div className="flex flex-col items-center justify-center w-full max-w-md h-[600px] bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold mb-4">No profiles available</h2>
+      <p className="text-gray-600 text-center">Come back later for more matches!</p>
+    </div>
+  );
+
+  return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <header className="w-full bg-white shadow-md p-4 z-10">
         <div className="container mx-auto">
@@ -92,8 +123,12 @@ export default function Home() {
         </p>
       </div>
 
-      <main className="flex-grow pb-16 flex justify-center items-center">
-        {currentProfile && (
+      <main className="relative flex-grow pb-16 flex justify-center items-center">
+        {isLoading ? (
+          <ShimmerEffect />
+        ) : profiles.length === 0 ? (
+          <ComeBackLater />
+        ) : currentProfile && (
           <motion.div
             animate={controls}
             className="relative w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden"
@@ -135,7 +170,7 @@ export default function Home() {
                 ))
               )}
             </div>
-            <div className="relative h-14 flex flex-col">
+            <div className="flex flex-col">
               {/* Fixed Profile Information */}
               <div className="fixed inset-x-0 bottom-4 flex flex-col items-center p-4 bg-white shadow-md">
                 <h2 className="text-xl font-semibold">{currentProfile?.firstName} {currentProfile?.lastName}</h2>
@@ -147,7 +182,7 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Fixed Swipe Buttons */}
+           
               <div className="fixed inset-x-0 bottom-10 flex justify-between px-4">
                 <button
                   className="bg-red-500 text-white p-3 rounded-full shadow-md flex items-center justify-center"
@@ -186,5 +221,5 @@ export default function Home() {
         )}
       </main>
     </div>
-  </>;
+  );
 }
