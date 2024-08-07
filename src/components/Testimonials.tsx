@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import Image from "next/legacy/image";
+import Image from "next/image";
 
 const featuredTestimonial = {
   body: `Thanks to LoveConnect, I found my soulmate! The matching algorithm is spot-on, and the user experience is fantastic. Within weeks, I met someone special, and we've been happily together for over a year now.`,
@@ -110,7 +110,10 @@ export function Testimonials() {
                 alt=""
                 width={40}
                 height={40}
-              />
+                style={{
+                  maxWidth: "100%",
+                  height: "auto"
+                }} />
               <div className="flex-auto">
                 <div className="font-semibold">{featuredTestimonial.author.name}</div>
                 <div className="text-gray-600">{`@${featuredTestimonial.author.handle}`}</div>
@@ -153,7 +156,10 @@ export function Testimonials() {
                           alt=""
                           width={40}
                           height={40}
-                        />
+                          style={{
+                            maxWidth: "100%",
+                            height: "auto"
+                          }} />
                         <div>
                           <div className="font-semibold">{testimonial.author.name}</div>
                           {testimonial.author.handle ? (
