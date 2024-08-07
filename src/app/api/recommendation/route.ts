@@ -44,7 +44,7 @@ export async function GET(req: Request) {
         ) as distance
       FROM "User" u
       JOIN "Location" l ON u.id = l."userId"
-      WHERE u.email != ${session.user.email}
+      WHERE u.email != ${""}
         AND ST_DWithin(
           l.coordinates::geography,
           ST_SetSRID(ST_MakePoint(${userLocation.location.longitude}, ${userLocation.location.latitude}), 4326)::geography,
