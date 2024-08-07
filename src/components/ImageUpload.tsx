@@ -7,19 +7,19 @@ import { Area, Point } from 'react-easy-crop';
 import { useToast } from './ui/use-toast';
 
 interface ImageUploadProps {
-  handleImageChange:any;
-  handleImageRemove:any;
-  id:number;
+  handleImageChange: any;
+  handleImageRemove: any;
+  id: number;
 }
 
-export default function ImageUpload({ handleImageChange,handleImageRemove ,id}: ImageUploadProps) {
+export default function ImageUpload({ handleImageChange, handleImageRemove, id }: ImageUploadProps) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast()
-
 
   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -28,41 +28,45 @@ export default function ImageUpload({ handleImageChange,handleImageRemove ,id}: 
   const handleLocalImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedImage(URL.createObjectURL(event.target.files[0]));
+      setIsSaved(false);
     }
   };
 
   const handleSave = useCallback(async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
+    if (isSaved) return;
+    
     try {
       if (selectedImage && croppedAreaPixels) {
         const croppedImage = await getCroppedImg(selectedImage, croppedAreaPixels);
         const file = await blobToFile(croppedImage, 'cropped_image.jpg');
         console.log('Cropped image file:', file);
         handleImageChange(file);
+        setIsSaved(true);
         toast({
-            title: "Image Added",
-            description: "",
-          })
-  
+          title: "Image Added",
+          description: "",
+        });
       }
     } catch (e) {
       console.error('Error saving image:', e);
     }
-  }, [selectedImage, croppedAreaPixels, handleImageChange]);
+  }, [selectedImage, croppedAreaPixels, handleImageChange, isSaved]);
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
     setSelectedImage(null);
     handleImageRemove(id);
     setCrop({ x: 0, y: 0 });
     setZoom(1);
+    setIsSaved(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     toast({
-        title: "Image Removed",
-        description: "",
-      })
+      title: "Image Removed",
+      description: "",
+    });
   };
 
   return (
@@ -109,7 +113,9 @@ export default function ImageUpload({ handleImageChange,handleImageRemove ,id}: 
         <div style={{ marginTop: '20px', width: '400px' }}>
           <div style={{ display: 'flex', justifyContent:'center', gap:'10px', marginTop: '20px' }}>
             <Button onClick={handleCancel}>Cancel</Button>
-            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleSave} disabled={isSaved}>
+              {isSaved ? 'Saved' : 'Save'}
+            </Button>
           </div>
         </div>
       )}
@@ -117,6 +123,7 @@ export default function ImageUpload({ handleImageChange,handleImageRemove ,id}: 
   );
 }
 
+// Helper functions (getCroppedImg, createImage, blobToFile) remain the same
 // Helper function to create a cropped image
 async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
   const image = await createImage(imageSrc);

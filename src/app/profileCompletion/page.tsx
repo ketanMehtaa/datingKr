@@ -16,6 +16,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import ImageUpload from '../../components/ImageUpload'
+
 interface FormData {
   firstName: string;
   lastName: string;
@@ -80,36 +81,27 @@ export default function CompleteProfileForm() {
     images: '',
   });
 
-
   const handleImageChange = (event: any) => {
-
-    setFormData(prevState => ({
-      ...prevState,
-      images: [...prevState.images, event]
-    }));
-    setErrors((prevErrors) => ({ ...prevErrors, images: '' }));
+    if (formData.images.length < 2) {
+      setFormData(prevState => ({
+        ...prevState,
+        images: [...prevState.images, event]
+      }));
+      setErrors((prevErrors) => ({ ...prevErrors, images: '' }));
+    } else {
+      setErrors((prevErrors) => ({ ...prevErrors, images: 'Only 2 images are allowed' }));
+    }
   };
+
   const handleImageRemove = (id: number) => {
     setFormData(prevState => {
-      if (id === 1) {
-        // Remove the first image if id is 1
-        return {
-          ...prevState,
-          images: prevState.images.slice(1) // Removes the first image
-        };
-      } else if (id === 2) {
-        // Remove the second image if id is 2
-        return {
-          ...prevState,
-          images: [
-            ...prevState.images.slice(0, 1), // Keep the first image
-            ...prevState.images.slice(2)    // Remove the second image (index 1) and keep the rest
-          ]
-        };
-      }
-      // Return state unmodified if id is not 1 or 2
-      return prevState;
+      const newImages = prevState.images.filter((_, index) => index !== id - 1);
+      return {
+        ...prevState,
+        images: newImages
+      };
     });
+    setErrors((prevErrors) => ({ ...prevErrors, images: '' }));
   };
 
   useEffect(() => {
@@ -193,8 +185,8 @@ export default function CompleteProfileForm() {
         validationErrors[key] = `${key.charAt(0).toUpperCase() + key.slice(1)} is required`;
       }
     }
-    if (formData.images.length < 2) {
-      validationErrors.images = 'At least 2 images are required';
+    if (formData.images.length !== 2) {
+      validationErrors.images = 'Exactly 2 images are required';
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -395,10 +387,10 @@ export default function CompleteProfileForm() {
         />
         {errors.country && <div className="text-red-500 text-sm mt-1">{errors.country}</div>}
 
+        <ImageUpload handleImageChange={handleImageChange} handleImageRemove={handleImageRemove} id={1} key="upload1" />
+        <ImageUpload handleImageChange={handleImageChange} handleImageRemove={handleImageRemove} id={2} key="upload2" />
 
-
-        < ImageUpload handleImageChange={handleImageChange} handleImageRemove={handleImageRemove} id={1} key="upload1" />
-        < ImageUpload handleImageChange={handleImageChange} handleImageRemove={handleImageRemove} id={2} key="upload2" />
+        {errors.images && <div className="text-red-500 text-sm mt-1">{errors.images}</div>}
 
         {locationError && <p className="text-red-500">{locationError}</p>}
         <Button type="submit" className="w-full bg-pink-700 text-white hover:bg-pink-700">
